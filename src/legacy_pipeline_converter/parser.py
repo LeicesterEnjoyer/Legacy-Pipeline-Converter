@@ -47,16 +47,27 @@ def parse_pipeline(data: dict[str, Any]) -> Pipeline:
             message="Pipeline field 'steps' must be a list.",
         )
 
-    steps = tuple(_parse_step(step_data) for step_data in steps_data)
+    steps = tuple(
+        _parse_step(step_data, index)
+        for index, step_data in enumerate(steps_data)
+    )
+
     return Pipeline(name=data["name"], steps=steps)
 
 
-def _parse_step(step_data: dict[str, Any]) -> Step:
+def _parse_step(step_data: Any, index: int) -> Step:
     if not isinstance(step_data, dict):
         raise ParseError(
             step_id=None,
             field="steps",
-            message="Each pipeline step must be an object.",
+            message=f"Invalid step at index {index}: step must be an object.",
+        )
+
+    if "id" not in step_data:
+        raise ParseError(
+            step_id=None,
+            field="id",
+            message=f"Invalid step at index {index}: field 'id' is required.",
         )
 
     step_id = step_data.get("id")

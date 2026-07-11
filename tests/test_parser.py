@@ -160,20 +160,67 @@ def test_parse_unsupported_step_type_raises_clear_error() -> None:
     assert "bad_step" in str(error)
 
 
-def test_parse_missing_required_field_raises_clear_error() -> None:
+@pytest.mark.parametrize(
+    ("step_data", "missing_field"),
+    [
+        (
+            {
+                "id": "orders_source",
+                "type": "source",
+            },
+            "path",
+        ),
+        (
+            {
+                "id": "valid_orders",
+                "type": "filter",
+                "input": "orders_source",
+            },
+            "condition",
+        ),
+        (
+            {
+                "id": "orders_with_revenue",
+                "type": "calculated_column",
+                "input": "valid_orders",
+                "column": "revenue",
+            },
+            "expression",
+        ),
+        (
+            {
+                "id": "enriched_orders",
+                "type": "join",
+                "left": "orders_with_revenue",
+                "right": "customers_source",
+                "left_key": "customer_id",
+                "right_key": "id",
+            },
+            "join_type",
+        ),
+        (
+            {
+                "id": "final_output",
+                "type": "output",
+                "input": "enriched_orders",
+            },
+            "table",
+        ),
+    ],
+)
+def test_parse_missing_required_field_raises_clear_error(step_data: dict, missing_field: str) -> None:
     with pytest.raises(ParseError) as exc_info:
         parse_pipeline(
             {
                 "name": "missing_field",
-                "steps": [{"id": "valid_orders", "type": "filter", "input": "orders_source"}],
+                "steps": [step_data],
             }
         )
 
     error = exc_info.value
-    assert error.step_id == "valid_orders"
-    assert error.field == "condition"
-    assert "condition" in error.message
-    assert "valid_orders" in str(error)
+    assert error.step_id == step_data["id"]
+    assert error.field == missing_field
+    assert missing_field in error.message
 
 
 def test_parse_ignores_extra_fields() -> None:
@@ -211,3 +258,85 @@ def test_parse_empty_steps_list_succeeds() -> None:
 
     assert pipeline.name == "empty_pipeline"
     assert pipeline.steps == ()
+
+
+def test_parse_missing_steps_raises_clear_error() -> None:
+    with pytest.raises(ParseError) as exc_info:
+        parse_pipeline({"name": "missing_steps"})
+
+    error = exc_info.value
+    assert error.step_id is None
+    assert error.field == "steps"
+    assert "steps" in error.message
+
+
+def test_parse_non_list_steps_raises_clear_error() -> None:
+    with pytest.raises(ParseError) as exc_info:
+        parse_pipeline(
+            {
+                "name": "invalid_steps",
+                "steps": {"id": "orders_source"},
+            }
+        )
+
+    error = exc_info.value
+    assert error.step_id is None
+    assert error.field == "steps"
+    assert "list" in error.message
+
+
+def test_parse_non_object_step_raises_clear_error() -> None:
+    with pytest.raises(ParseError) as exc_info:
+        parse_pipeline(
+            {
+                "name": "invalid_step",
+                "steps": ["not-an-object"],
+            }
+        )
+
+    error = exc_info.value
+    assert error.step_id is None
+    assert error.field == "steps"
+    assert "index 0" in error.message
+    assert "object" in error.message
+
+
+def test_parse_step_missing_id_raises_clear_error() -> None:
+    with pytest.raises(ParseError) as exc_info:
+        parse_pipeline(
+            {
+                "name": "missing_id",
+                "steps": [
+                    {
+                        "type": "source",
+                        "path": "orders.csv",
+                    }
+                ],
+            }
+        )
+
+    error = exc_info.value
+    assert error.step_id is None
+    assert error.field == "id"
+    assert "index 0" in error.message
+    assert "id" in error.message
+
+
+def test_parse_step_missing_type_raises_clear_error() -> None:
+    with pytest.raises(ParseError) as exc_info:
+        parse_pipeline(
+            {
+                "name": "missing_type",
+                "steps": [
+                    {
+                        "id": "orders_source",
+                        "path": "orders.csv",
+                    }
+                ],
+            }
+        )
+
+    error = exc_info.value
+    assert error.step_id == "orders_source"
+    assert error.field == "type"
+    assert "type" in error.message
