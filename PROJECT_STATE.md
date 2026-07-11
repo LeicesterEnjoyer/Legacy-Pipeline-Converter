@@ -2,7 +2,7 @@
 
 ## Current Phase
 
-Parser implementation and test coverage expansion.
+Validation.
 
 ---
 
@@ -35,27 +35,27 @@ Parser implementation and test coverage expansion.
 - Supports all v1 transformation types.
 - Ignores unknown fields.
 - Keeps parsing and validation responsibilities separate.
+- Provides clear parse errors, including invalid step indexes.
 
-### Tests
-- Added parser tests for:
-  - valid example pipeline;
-  - all supported transformation types;
-  - unsupported step types;
-  - missing required fields;
-  - ignored extra fields;
-  - missing pipeline name;
-  - empty pipeline parsing.
+### Parser test coverage
+- Valid example pipeline.
+- All supported transformation types.
+- Unsupported step types.
+- Missing required fields.
+- Missing pipeline name.
+- Missing `steps`.
+- Non-list `steps`.
+- Non-object step entries.
+- Missing step `id`.
+- Missing step `type`.
+- Ignored extra fields.
+- Empty pipeline parsing.
+
+**Status:** All test cases are passing (`20 passed in 0.05s`).
 
 ---
 
 ## In Progress
-
-- Expanding parser test coverage for parser edge cases:
-  - missing `steps`;
-  - invalid `steps` container;
-  - non-object steps;
-  - missing step `id`;
-  - missing step `type`.
 
 ---
 
@@ -87,5 +87,5 @@ Planned validation rules:
 
 ## Current Status
 
-Parser implementation is functional and under test coverage expansion.
-Validation will begin after parser coverage is completed.
+Parser phase is complete and all parser tests are passing.
+The next milestone is implementing validation rules.
