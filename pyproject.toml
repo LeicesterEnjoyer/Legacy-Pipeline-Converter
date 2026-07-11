@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "legacy-pipeline-converter"
+version = "0.1.0"
+requires-python = ">=3.11"
+dependencies = []
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=9.1",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["legacy_pipeline_converter*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

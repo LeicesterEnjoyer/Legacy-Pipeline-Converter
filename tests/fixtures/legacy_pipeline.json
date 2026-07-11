@@ -1,0 +1,43 @@
+{
+  "name": "order_revenue_pipeline",
+  "steps": [
+    {
+      "id": "orders_source",
+      "type": "source",
+      "path": "orders.csv"
+    },
+    {
+      "id": "valid_orders",
+      "type": "filter",
+      "input": "orders_source",
+      "condition": "status != 'cancelled'"
+    },
+    {
+      "id": "orders_with_revenue",
+      "type": "calculated_column",
+      "input": "valid_orders",
+      "column": "revenue",
+      "expression": "price * quantity"
+    },
+    {
+      "id": "customers_source",
+      "type": "source",
+      "path": "customers.csv"
+    },
+    {
+      "id": "enriched_orders",
+      "type": "join",
+      "left": "orders_with_revenue",
+      "right": "customers_source",
+      "left_key": "customer_id",
+      "right_key": "id",
+      "join_type": "left"
+    },
+    {
+      "id": "final_output",
+      "type": "output",
+      "input": "enriched_orders",
+      "table": "fct_order_revenue"
+    }
+  ]
+}
