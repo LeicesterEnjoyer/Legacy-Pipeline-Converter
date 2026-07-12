@@ -2,7 +2,7 @@
 
 ## Current Phase
 
-Validation.
+Phase 3 – Dependency Ordering.
 
 ---
 
@@ -11,10 +11,17 @@ Validation.
 ### Project setup
 - Created repository structure.
 - Added `README.md`, `SPEC.md`, `AGENTS.md`, and `AGENT_FAILURES.md`.
-- Added `clarifications-v1.md`.
+- Added `docs/clarifications-v1.md`.
+- Added `docs/implementation-plan-v1.md`.
 - Configured `pyproject.toml`.
 - Added `.gitignore`.
 - Set up a local virtual environment.
+
+### Architecture and planning
+- Defined the approved v1 architecture in `docs/implementation-plan-v1.md`.
+- Defined module responsibilities and public APIs.
+- Defined the phased implementation plan and ordered test plan.
+- Documented the TDD workflow and agent handoff process.
 
 ### Domain model
 - Implemented immutable domain models:
@@ -29,6 +36,12 @@ Validation.
 - Implemented `ConversionError`.
 - Implemented `ParseError`.
 - Implemented `UnsupportedStepTypeError`.
+- Implemented validation-specific errors:
+  - `ValidationError`
+  - `DuplicateStepIdError`
+  - `MissingReferenceError`
+  - `InvalidJoinTypeError`
+  - `NoOutputStepError`
 
 ### Parser
 - Implemented JSON-to-domain-model parsing.
@@ -51,7 +64,30 @@ Validation.
 - Ignored extra fields.
 - Empty pipeline parsing.
 
-**Status:** All test cases are passing (`20 passed in 0.05s`).
+**Status:** All parser test cases are passing (`20 passed`).
+
+### Validation
+- Implemented pipeline validation for:
+  - unique step IDs;
+  - valid dependencies for filter and output steps;
+  - valid left and right dependencies for join steps;
+  - supported join types;
+  - at least one output step;
+  - multiple output steps allowed;
+  - orphan steps allowed.
+
+### Validation test coverage
+- Duplicate step IDs.
+- Missing input dependencies.
+- Missing join references.
+- Invalid join types.
+- All supported join types.
+- Zero output steps.
+- Multiple output steps.
+- Orphan steps.
+- Canonical example pipeline.
+
+**Status:** All validation test cases are passing (`13 passed`).
 
 ---
 
@@ -61,15 +97,12 @@ Validation.
 
 ## Next Phase
 
-Validation.
+Phase 4 – SQL Generation.
 
-Planned validation rules:
-
-- unique step IDs;
-- valid dependencies;
-- supported join types;
-- at least one output step;
-- multiple output steps allowed.
+Planned scope:
+- Build the dependency graph.
+- Produce deterministic topological ordering.
+- Detect cyclic dependencies.
 
 ---
 
@@ -77,6 +110,7 @@ Planned validation rules:
 
 - Dependency graph.
 - Topological ordering.
+- Cycle detection.
 - SQL generation.
 - Conversion report generation.
 - File output.
@@ -87,5 +121,9 @@ Planned validation rules:
 
 ## Current Status
 
-Parser phase is complete and all parser tests are passing.
-The next milestone is implementing validation rules.
+Phases 1 and 2 are complete:
+
+- Parsing and domain models ✅
+- Validation ✅
+
+The next milestone is implementing deterministic dependency ordering and cycle detection.
