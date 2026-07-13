@@ -45,7 +45,7 @@ When the specification guarantees the presence of a value, reflect that guarante
 
 ### Related specification
 
-- [Phase 2 – Validation](docs/implementation-plan-v1.md#phase-2--validation)
+- [Phase 2 – Validation](docs/implementation-plan-v1.md#phase-2-validation)
 - [C6. Supported join types](docs/clarifications-v1.md#c6-supported-join-types)
 
 ### Context
@@ -78,7 +78,7 @@ Do not assume that an AI-generated test suite fully covers the approved implemen
 
 ### Related specification
 
-- [Phase 3 – Dependency ordering](docs/implementation-plan-v1.md#phase-3--dependency-ordering)
+- [Phase 3 – Dependency ordering](docs/implementation-plan-v1.md#phase-3-dependency-ordering)
 - [Supporting models](docs/implementation-plan-v1.md#supporting-models)
 
 ### Context
