@@ -2,7 +2,7 @@
 
 ## Current Phase
 
-Phase 3 – Dependency Ordering.
+Phase 4 – SQL Generation.
 
 ---
 
@@ -32,6 +32,7 @@ Phase 3 – Dependency Ordering.
   - `JoinStep`
   - `OutputStep`
   - `Pipeline`
+  - `OrderedPipeline`
 
 ### Error handling
 - Implemented `ConversionError`.
@@ -43,6 +44,8 @@ Phase 3 – Dependency Ordering.
   - `MissingReferenceError`
   - `InvalidJoinTypeError`
   - `NoOutputStepError`
+- Implemented ordering-specific errors:
+  - `CyclicDependencyError`
 
 ### Parser
 - Implemented JSON-to-domain-model parsing.
@@ -91,37 +94,64 @@ Phase 3 – Dependency Ordering.
 
 **Status:** All validation test cases are passing (`14 passed`).
 
+### Dependency ordering
+- Implemented dependency graph construction.
+- Implemented deterministic topological ordering using Kahn's algorithm.
+- Preserves JSON declaration order when multiple steps are ready.
+- Supports dependencies for:
+  - filter steps;
+  - calculated-column steps;
+  - join steps;
+  - output steps.
+- Implemented cyclic dependency detection.
+- Returns an immutable `OrderedPipeline`.
+
+### Dependency ordering test coverage
+- Canonical example pipeline dependency order.
+- Declaration-order tie-breaking for independent steps.
+- Cyclic dependency errors.
+- Deterministic ordering across repeated calls.
+
+**Status:** All dependency ordering test cases are passing (`4 passed`).
+
 ---
 
 ## In Progress
 
-Phase 3 – Dependency Ordering.
+Phase 4 – SQL Generation.
 
 Planned scope:
-- Build the dependency graph.
-- Produce deterministic topological ordering.
-- Detect cyclic dependencies.
+- Add the `GeneratedModel` domain model.
+- Generate no SQL model for source steps.
+- Generate SQL for filter steps.
+- Generate SQL for calculated-column steps.
+- Generate SQL for join steps.
+- Generate SQL for output steps.
+- Use `{{ ref('step_id') }}` for transformed upstream models.
+- Use source relation names derived from source paths.
+- Generate filenames using `<step_id>.sql`.
+- Exclude dbt `config()` blocks.
+- Preserve deterministic SQL formatting and model ordering.
 
 ---
 
 ## Next Phase
 
-Phase 4 – SQL Generation.
+Phase 5 – Conversion Report.
 
 Planned scope:
-- Generate SQL for all supported step types.
-- Produce deterministic SQL model output.
-- Generate output models in dependency order.
-- Validate generated SQL against the approved examples.
+- Add the `ConversionReport` domain model.
+- Generate successful conversion reports.
+- Populate generated model filenames in dependency order.
+- Generate failed conversion reports with formatted errors.
+- Keep warnings empty in v1.
 
 ---
 
 ## Not Implemented
 
-- Dependency graph.
-- Topological ordering.
-- Cycle detection.
 - SQL generation.
+- Generated SQL model representation.
 - Conversion report generation.
 - File output.
 - End-to-end conversion.
@@ -131,10 +161,11 @@ Planned scope:
 
 ## Current Status
 
-Phases 1 and 2 are complete:
+Phases 1 through 3 are complete:
 
 - Parsing and domain models ✅
 - Validation ✅
 - Validation v2 improvements ✅
+- Dependency ordering and cycle detection ✅
 
-The next milestone is implementing deterministic dependency ordering and cycle detection.
+The next milestone is generating deterministic dbt-style SQL models from the ordered pipeline.
