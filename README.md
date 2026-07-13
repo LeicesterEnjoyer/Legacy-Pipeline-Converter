@@ -41,7 +41,6 @@ The application should:
 
 - Parse pipeline definitions from JSON.
 - Validate:
-
   - unique step IDs;
   - missing dependencies;
   - supported join types;
@@ -129,20 +128,26 @@ legacy-pipeline-converter/
 ├── data/
 │   └── legacy_pipeline.json           # Example pipeline.
 ├── docs/
-│   └── clarifications-v1.md           # Resolved ambiguities.
+│   ├── clarifications-v1.md           # Resolved ambiguities for v1.
+│   ├── clarifications-v2.md           # Superseding decisions and enhancements.
+│   └── implementation-plan-v1.md      # Approved architecture and phased test plan.
 ├── generated/                         # Generated artifacts.
 ├── src/
 │   └── legacy_pipeline_converter/
 │       ├── __init__.py                # Package initialization.
 │       ├── errors.py                  # Custom exceptions.
-│       ├── models.py                  # Domain models.
-│       └── parser.py                  # JSON parser.
+│       ├── models.py                  # Domain and supporting models.
+│       ├── parser.py                  # JSON-to-domain parser.
+│       ├── validator.py               # Pipeline validation rules.
+│       └── ordering.py                # Dependency graph and topological ordering.
 ├── tests/
 │   ├── conftest.py                    # Shared test fixtures.
 │   ├── test_parser.py                 # Parser tests.
+│   ├── test_validator.py              # Validation tests.
+│   ├── test_ordering.py               # Dependency ordering tests.
 │   └── fixtures/
 │       └── legacy_pipeline.json       # Example fixture.
-└── .venv/                             # Local environment.
+└── .venv/                             # Local virtual environment.
 ```
 
 ## Development Principles
@@ -161,7 +166,9 @@ legacy-pipeline-converter/
 See:
 
 - `PROJECT_STATE.md`
+- `docs\implementation-plan-v1.md`
 - `docs/clarifications-v1.md`
+- `docs/clarifications-v2.md`
 
 for implementation progress and design decisions.
 
