@@ -73,3 +73,39 @@ The omitted tests were identified during manual review and added manually.
 ### Lesson learned
 
 Do not assume that an AI-generated test suite fully covers the approved implementation plan.
+
+## F-003: OrderedPipeline was implemented in the wrong module
+
+### Related specification
+
+- [Phase 3 – Dependency ordering](docs/implementation-plan-v1.md#phase-3--dependency-ordering)
+- [Supporting models](docs/implementation-plan-v1.md#supporting-models)
+
+### Context
+
+The AI implemented `OrderedPipeline` directly inside `ordering.py` as a regular class instead of defining it in `models.py` as a domain model.
+
+### Why it was a problem
+
+The approved architecture explicitly defines `OrderedPipeline` as a supporting domain model:
+
+```python
+OrderedPipeline:
+    pipeline: Pipeline
+    execution_order: tuple[str, ...]
+```
+
+Placing the model inside ordering.py violated the module responsibilities established by the architecture:
+
+models.py should contain domain models and supporting dataclasses.
+ordering.py should contain dependency ordering logic only.
+
+### Resolution
+
+OrderedPipeline was moved to models.py and implemented as a frozen dataclass.
+
+ordering.py now imports and returns the shared domain model instead of defining its own local class.
+
+### Lesson learned
+
+AI-generated code may satisfy functional requirements while still violating architectural boundaries.

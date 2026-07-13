@@ -37,5 +37,9 @@ class NoOutputStepError(ValidationError):
     """Raised when a pipeline contains no output steps."""
 
 
+class CyclicDependencyError(ValidationError):
+    """Raised when the step dependency graph contains a cycle."""
+
+
 class DuplicateStepIdError(ValidationError):
     """Raised when multiple steps share the same id."""

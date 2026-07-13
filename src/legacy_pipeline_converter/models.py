@@ -46,3 +46,9 @@ Step = SourceStep | FilterStep | CalculatedColumnStep | JoinStep | OutputStep
 class Pipeline:
     name: str
     steps: tuple[Step, ...]
+
+
+@dataclass(frozen=True)
+class OrderedPipeline:
+    pipeline: Pipeline
+    execution_order: tuple[str, ...]
