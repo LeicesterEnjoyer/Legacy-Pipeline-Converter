@@ -95,6 +95,13 @@ Phase 3 – Dependency Ordering.
 
 ## In Progress
 
+Phase 3 – Dependency Ordering.
+
+Planned scope:
+- Build the dependency graph.
+- Produce deterministic topological ordering.
+- Detect cyclic dependencies.
+
 ---
 
 ## Next Phase
@@ -102,9 +109,10 @@ Phase 3 – Dependency Ordering.
 Phase 4 – SQL Generation.
 
 Planned scope:
-- Build the dependency graph.
-- Produce deterministic topological ordering.
-- Detect cyclic dependencies.
+- Generate SQL for all supported step types.
+- Produce deterministic SQL model output.
+- Generate output models in dependency order.
+- Validate generated SQL against the approved examples.
 
 ---
 
