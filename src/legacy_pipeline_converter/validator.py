@@ -5,6 +5,7 @@ from legacy_pipeline_converter.errors import (
     NoOutputStepError,
 )
 from legacy_pipeline_converter.models import (
+    CalculatedColumnStep,
     FilterStep,
     JoinStep,
     OutputStep,
@@ -28,7 +29,7 @@ def validate_pipeline(pipeline: Pipeline) -> Pipeline:
         seen_ids.add(step.id)
 
     for step in pipeline.steps:
-        if isinstance(step, (FilterStep, OutputStep)):
+        if isinstance(step, (FilterStep, CalculatedColumnStep, OutputStep)):
             if step.input not in step_lookup:
                 raise MissingReferenceError(
                     step_id=step.id,

@@ -12,6 +12,7 @@ Phase 3 – Dependency Ordering.
 - Created repository structure.
 - Added `README.md`, `SPEC.md`, `AGENTS.md`, and `AGENT_FAILURES.md`.
 - Added `docs/clarifications-v1.md`.
+- Added `docs/clarifications-v2.md`.
 - Added `docs/implementation-plan-v1.md`.
 - Configured `pyproject.toml`.
 - Added `.gitignore`.
@@ -69,7 +70,7 @@ Phase 3 – Dependency Ordering.
 ### Validation
 - Implemented pipeline validation for:
   - unique step IDs;
-  - valid dependencies for filter and output steps;
+  - valid dependencies for filter, calculated-column, and output steps;
   - valid left and right dependencies for join steps;
   - supported join types;
   - at least one output step;
@@ -79,6 +80,7 @@ Phase 3 – Dependency Ordering.
 ### Validation test coverage
 - Duplicate step IDs.
 - Missing input dependencies.
+- Missing calculated-column dependencies.
 - Missing join references.
 - Invalid join types.
 - All supported join types.
@@ -87,7 +89,7 @@ Phase 3 – Dependency Ordering.
 - Orphan steps.
 - Canonical example pipeline.
 
-**Status:** All validation test cases are passing (`13 passed`).
+**Status:** All validation test cases are passing (`14 passed`).
 
 ---
 
@@ -125,5 +127,6 @@ Phases 1 and 2 are complete:
 
 - Parsing and domain models ✅
 - Validation ✅
+- Validation v2 improvements ✅
 
 The next milestone is implementing deterministic dependency ordering and cycle detection.

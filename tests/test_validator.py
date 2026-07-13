@@ -67,6 +67,33 @@ def test_validate_missing_input_reference_raises_clear_error() -> None:
     assert "missing_step" in error.message
 
 
+def test_validate_calculated_column_missing_input_reference_raises_clear_error() -> None:
+    pipeline = Pipeline(
+        name="missing_calculated_column_dependency",
+        steps=(
+            CalculatedColumnStep(
+                id="calc_revenue",
+                input="missing_step",
+                column="revenue",
+                expression="price * quantity",
+            ),
+            OutputStep(
+                id="final_output",
+                input="calc_revenue",
+                table="fct_orders",
+            ),
+        ),
+    )
+
+    with pytest.raises(MissingReferenceError) as exc_info:
+        validate_pipeline(pipeline)
+
+    error = exc_info.value
+    assert error.step_id == "calc_revenue"
+    assert error.field == "input"
+    assert "missing_step" in error.message
+
+
 def test_validate_join_missing_left_reference_raises_clear_error() -> None:
     pipeline = Pipeline(
         name="missing_join_left_reference",
@@ -267,9 +294,7 @@ def test_validate_orphan_steps_do_not_fail() -> None:
     ]
 
 
-def test_validate_example_pipeline_passes(
-    example_pipeline_data: dict,
-) -> None:
+def test_validate_example_pipeline_passes(example_pipeline_data: dict) -> None:
     pipeline = parse_pipeline(example_pipeline_data)
 
     validated = validate_pipeline(pipeline)
