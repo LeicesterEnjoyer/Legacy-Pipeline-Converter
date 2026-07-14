@@ -121,7 +121,7 @@ legacy-pipeline-converter/
 ├── README.md                          # Project overview.
 ├── SPEC.md                            # Requirements and acceptance criteria.
 ├── AGENTS.md                          # AI development workflow.
-├── AGENT_FAILURES.md                  # Lessons learned.
+├── AGENT_FAILURES.md                  # Lessons learned from AI-assisted development.
 ├── PROJECT_STATE.md                   # Current implementation status.
 ├── pyproject.toml                     # Project metadata and dependencies.
 ├── .gitignore                         # Git exclusions.
@@ -134,17 +134,19 @@ legacy-pipeline-converter/
 ├── generated/                         # Generated artifacts.
 ├── src/
 │   └── legacy_pipeline_converter/
-│       ├── __init__.py                # Package initialization.
+│       ├── __init__.py                # Package initialization and public exports.
 │       ├── errors.py                  # Custom exceptions.
 │       ├── models.py                  # Domain and supporting models.
 │       ├── parser.py                  # JSON-to-domain parser.
 │       ├── validator.py               # Pipeline validation rules.
-│       └── ordering.py                # Dependency graph and topological ordering.
+│       ├── ordering.py                # Dependency graph and deterministic ordering.
+│       └── sql_generator.py           # dbt-style SQL model generation.
 ├── tests/
 │   ├── conftest.py                    # Shared test fixtures.
 │   ├── test_parser.py                 # Parser tests.
 │   ├── test_validator.py              # Validation tests.
 │   ├── test_ordering.py               # Dependency ordering tests.
+│   ├── test_sql_generator.py          # SQL generation tests.
 │   └── fixtures/
 │       └── legacy_pipeline.json       # Example fixture.
 └── .venv/                             # Local virtual environment.
@@ -166,7 +168,7 @@ legacy-pipeline-converter/
 See:
 
 - `PROJECT_STATE.md`
-- `docs\implementation-plan-v1.md`
+- `docs/implementation-plan-v1.md`
 - `docs/clarifications-v1.md`
 - `docs/clarifications-v2.md`
 

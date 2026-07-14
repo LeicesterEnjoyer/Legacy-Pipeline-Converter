@@ -2,13 +2,14 @@
 
 ## Current Phase
 
-Phase 4 – SQL Generation.
+Phase 5 – Conversion Report.
 
 ---
 
 ## Completed
 
 ### Project setup
+
 - Created repository structure.
 - Added `README.md`, `SPEC.md`, `AGENTS.md`, and `AGENT_FAILURES.md`.
 - Added `docs/clarifications-v1.md`.
@@ -19,12 +20,14 @@ Phase 4 – SQL Generation.
 - Set up a local virtual environment.
 
 ### Architecture and planning
+
 - Defined the approved v1 architecture in `docs/implementation-plan-v1.md`.
 - Defined module responsibilities and public APIs.
 - Defined the phased implementation plan and ordered test plan.
 - Documented the TDD workflow and agent handoff process.
 
 ### Domain model
+
 - Implemented immutable domain models:
   - `SourceStep`
   - `FilterStep`
@@ -33,8 +36,10 @@ Phase 4 – SQL Generation.
   - `OutputStep`
   - `Pipeline`
   - `OrderedPipeline`
+  - `GeneratedModel`
 
 ### Error handling
+
 - Implemented `ConversionError`.
 - Implemented `ParseError`.
 - Implemented `UnsupportedStepTypeError`.
@@ -48,6 +53,7 @@ Phase 4 – SQL Generation.
   - `CyclicDependencyError`
 
 ### Parser
+
 - Implemented JSON-to-domain-model parsing.
 - Supports all v1 transformation types.
 - Ignores unknown fields.
@@ -55,6 +61,7 @@ Phase 4 – SQL Generation.
 - Provides clear parse errors, including invalid step indexes.
 
 ### Parser test coverage
+
 - Valid example pipeline.
 - All supported transformation types.
 - Unsupported step types.
@@ -71,6 +78,7 @@ Phase 4 – SQL Generation.
 **Status:** All parser test cases are passing (`20 passed`).
 
 ### Validation
+
 - Implemented pipeline validation for:
   - unique step IDs;
   - valid dependencies for filter, calculated-column, and output steps;
@@ -81,6 +89,7 @@ Phase 4 – SQL Generation.
   - orphan steps allowed.
 
 ### Validation test coverage
+
 - Duplicate step IDs.
 - Missing input dependencies.
 - Missing calculated-column dependencies.
@@ -95,6 +104,7 @@ Phase 4 – SQL Generation.
 **Status:** All validation test cases are passing (`14 passed`).
 
 ### Dependency ordering
+
 - Implemented dependency graph construction.
 - Implemented deterministic topological ordering using Kahn's algorithm.
 - Preserves JSON declaration order when multiple steps are ready.
@@ -107,6 +117,7 @@ Phase 4 – SQL Generation.
 - Returns an immutable `OrderedPipeline`.
 
 ### Dependency ordering test coverage
+
 - Canonical example pipeline dependency order.
 - Declaration-order tie-breaking for independent steps.
 - Cyclic dependency errors.
@@ -114,58 +125,91 @@ Phase 4 – SQL Generation.
 
 **Status:** All dependency ordering test cases are passing (`4 passed`).
 
+### SQL generation
+
+- Implemented deterministic SQL model generation.
+- Generates one `GeneratedModel` for every non-source step.
+- Skips SQL generation for source steps.
+- Generates SQL for:
+  - filter steps;
+  - calculated-column steps;
+  - join steps;
+  - output steps.
+- Uses `{{ ref('step_id') }}` for transformed upstream steps.
+- Uses relation names derived from source file paths.
+- Generates filenames using `<step_id>.sql`.
+- Generates models in dependency order.
+- Excludes dbt `config()` blocks.
+- Returns generated models as an immutable tuple.
+
+### SQL generation test coverage
+
+- Source steps generate no SQL model.
+- Filter-step SQL.
+- Calculated-column SQL.
+- Join-step SQL.
+- All supported join types.
+- Output-step SQL.
+- dbt `ref()` references for transformed upstream steps.
+- Existing relation names for source upstream steps.
+- Nested source path and extension removal.
+- Deterministic model filenames.
+- Absence of dbt `config()` blocks.
+- Canonical example pipeline models.
+- Deterministic SQL generation.
+
+**Status:** All SQL generation test cases are passing (`15 passed`).
+
 ---
 
 ## In Progress
 
-Phase 4 – SQL Generation.
-
-Planned scope:
-- Add the `GeneratedModel` domain model.
-- Generate no SQL model for source steps.
-- Generate SQL for filter steps.
-- Generate SQL for calculated-column steps.
-- Generate SQL for join steps.
-- Generate SQL for output steps.
-- Use `{{ ref('step_id') }}` for transformed upstream models.
-- Use source relation names derived from source paths.
-- Generate filenames using `<step_id>.sql`.
-- Exclude dbt `config()` blocks.
-- Preserve deterministic SQL formatting and model ordering.
-
----
-
-## Next Phase
-
 Phase 5 – Conversion Report.
 
 Planned scope:
+
 - Add the `ConversionReport` domain model.
 - Generate successful conversion reports.
 - Populate generated model filenames in dependency order.
 - Generate failed conversion reports with formatted errors.
 - Keep warnings empty in v1.
+- Produce a JSON-serializable report structure.
+
+---
+
+## Next Phase
+
+Phase 6 – End-to-End Conversion.
+
+Planned scope:
+
+- Implement pipeline JSON file reading.
+- Implement the orchestration API.
+- Compose parsing, validation, ordering, SQL generation, and reporting.
+- Write generated SQL models to disk.
+- Write the conversion report to disk.
+- Add end-to-end conversion tests.
 
 ---
 
 ## Not Implemented
 
-- SQL generation.
-- Generated SQL model representation.
 - Conversion report generation.
-- File output.
-- End-to-end conversion.
+- File input and output.
+- End-to-end orchestration.
+- End-to-end conversion tests.
 - Execution and result validation.
 
 ---
 
 ## Current Status
 
-Phases 1 through 3 are complete:
+Phases 1 through 4 are complete:
 
 - Parsing and domain models ✅
 - Validation ✅
 - Validation v2 improvements ✅
 - Dependency ordering and cycle detection ✅
+- SQL generation ✅
 
-The next milestone is generating deterministic dbt-style SQL models from the ordered pipeline.
+The next milestone is generating JSON-serializable success and failure reports.

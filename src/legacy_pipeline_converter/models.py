@@ -52,3 +52,10 @@ class Pipeline:
 class OrderedPipeline:
     pipeline: Pipeline
     execution_order: tuple[str, ...]
+
+
+@dataclass(frozen=True)
+class GeneratedModel:
+    step_id: str
+    filename: str
+    sql: str
