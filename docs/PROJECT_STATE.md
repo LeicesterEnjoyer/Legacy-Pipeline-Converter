@@ -2,7 +2,7 @@
 
 ## Current Phase
 
-Phase 5 – Conversion Report.
+Phase 6 – End-to-End Conversion.
 
 ---
 
@@ -103,6 +103,25 @@ Phase 5 – Conversion Report.
 
 **Status:** All validation test cases are passing (`14 passed`).
 
+### Conversion report
+
+- Implemented immutable `ConversionReport` domain model.
+- Implemented report generation for successful conversions.
+- Implemented report generation for failed conversions.
+- Populates generated model filenames in dependency order.
+- Stores C10-formatted error messages.
+- Keeps warnings empty in v1.
+- Supports JSON serialization via `dataclasses.asdict`.
+
+### Conversion report test coverage
+
+- Successful report schema.
+- Successful report model population.
+- Failed report error population.
+- Empty warnings in v1.
+
+**Status:** All conversion report test cases are passing (`4 passed`).
+
 ### Dependency ordering
 
 - Implemented dependency graph construction.
@@ -164,21 +183,6 @@ Phase 5 – Conversion Report.
 
 ## In Progress
 
-Phase 5 – Conversion Report.
-
-Planned scope:
-
-- Add the `ConversionReport` domain model.
-- Generate successful conversion reports.
-- Populate generated model filenames in dependency order.
-- Generate failed conversion reports with formatted errors.
-- Keep warnings empty in v1.
-- Produce a JSON-serializable report structure.
-
----
-
-## Next Phase
-
 Phase 6 – End-to-End Conversion.
 
 Planned scope:
@@ -192,9 +196,14 @@ Planned scope:
 
 ---
 
+## Next Phase
+
+None.
+
+---
+
 ## Not Implemented
 
-- Conversion report generation.
 - File input and output.
 - End-to-end orchestration.
 - End-to-end conversion tests.
@@ -204,12 +213,13 @@ Planned scope:
 
 ## Current Status
 
-Phases 1 through 4 are complete:
+Phases 1 through 5 are complete:
 
 - Parsing and domain models ✅
 - Validation ✅
 - Validation v2 improvements ✅
 - Dependency ordering and cycle detection ✅
 - SQL generation ✅
+- Conversion report generation ✅
 
-The next milestone is generating JSON-serializable success and failure reports.
+The final milestone for v1 is implementing the complete conversion pipeline and file generation workflow.

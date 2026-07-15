@@ -59,3 +59,12 @@ class GeneratedModel:
     step_id: str
     filename: str
     sql: str
+
+
+@dataclass(frozen=True)
+class ConversionReport:
+    pipeline_name: str
+    status: str
+    models_generated: tuple[str, ...]
+    errors: tuple[str, ...]
+    warnings: tuple[str, ...]

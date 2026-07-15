@@ -140,13 +140,15 @@ legacy-pipeline-converter/
 │       ├── parser.py                  # JSON-to-domain parser.
 │       ├── validator.py               # Pipeline validation rules.
 │       ├── ordering.py                # Dependency graph and deterministic ordering.
-│       └── sql_generator.py           # dbt-style SQL model generation.
+│       ├── sql_generator.py           # dbt-style SQL model generation.
+│       └── report.py                  # Conversion report generation.
 ├── tests/
 │   ├── conftest.py                    # Shared test fixtures.
 │   ├── test_parser.py                 # Parser tests.
 │   ├── test_validator.py              # Validation tests.
 │   ├── test_ordering.py               # Dependency ordering tests.
 │   ├── test_sql_generator.py          # SQL generation tests.
+│   ├── test_report.py                 # Conversion report tests.
 │   └── fixtures/
 │       └── legacy_pipeline.json       # Example fixture.
 └── .venv/                             # Local virtual environment.
@@ -167,7 +169,7 @@ legacy-pipeline-converter/
 
 See:
 
-- `PROJECT_STATE.md`
+- `docs/PROJECT_STATE.md`
 - `docs/implementation-plan-v1.md`
 - `docs/clarifications-v1.md`
 - `docs/clarifications-v2.md`
