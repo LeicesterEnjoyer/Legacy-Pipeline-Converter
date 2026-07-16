@@ -119,15 +119,15 @@ The application should:
 ```text
 legacy-pipeline-converter/
 ├── README.md                          # Project overview.
-├── SPEC.md                            # Requirements and acceptance criteria.
-├── AGENTS.md                          # AI development workflow.
-├── AGENT_FAILURES.md                  # Lessons learned from AI-assisted development.
-├── PROJECT_STATE.md                   # Current implementation status.
 ├── pyproject.toml                     # Project metadata and dependencies.
 ├── .gitignore                         # Git exclusions.
 ├── data/
 │   └── legacy_pipeline.json           # Example pipeline.
 ├── docs/
+│   ├── SPEC.md                        # Requirements and acceptance criteria.
+│   ├── AGENTS.md                      # AI development workflow.
+│   ├── AGENT_FAILURES.md              # Lessons learned from AI-assisted development.
+│   ├── PROJECT_STATE.md               # Current implementation status.
 │   ├── clarifications-v1.md           # Resolved ambiguities for v1.
 │   ├── clarifications-v2.md           # Superseding decisions and enhancements.
 │   └── implementation-plan-v1.md      # Approved architecture and phased test plan.
@@ -135,20 +135,24 @@ legacy-pipeline-converter/
 ├── src/
 │   └── legacy_pipeline_converter/
 │       ├── __init__.py                # Package initialization and public exports.
+│       ├── api.py                     # End-to-end conversion orchestration.
 │       ├── errors.py                  # Custom exceptions.
+│       ├── io.py                      # JSON input and generated file output.
 │       ├── models.py                  # Domain and supporting models.
-│       ├── parser.py                  # JSON-to-domain parser.
-│       ├── validator.py               # Pipeline validation rules.
 │       ├── ordering.py                # Dependency graph and deterministic ordering.
+│       ├── parser.py                  # JSON-to-domain parser.
+│       ├── report.py                  # Conversion report generation.
 │       ├── sql_generator.py           # dbt-style SQL model generation.
-│       └── report.py                  # Conversion report generation.
+│       └── validator.py               # Pipeline validation rules.
 ├── tests/
 │   ├── conftest.py                    # Shared test fixtures.
-│   ├── test_parser.py                 # Parser tests.
-│   ├── test_validator.py              # Validation tests.
+│   ├── test_api.py                    # End-to-end conversion tests.
+│   ├── test_io.py                     # File input and output tests.
 │   ├── test_ordering.py               # Dependency ordering tests.
-│   ├── test_sql_generator.py          # SQL generation tests.
+│   ├── test_parser.py                 # Parser tests.
 │   ├── test_report.py                 # Conversion report tests.
+│   ├── test_sql_generator.py          # SQL generation tests.
+│   ├── test_validator.py              # Validation tests.
 │   └── fixtures/
 │       └── legacy_pipeline.json       # Example fixture.
 └── .venv/                             # Local virtual environment.

@@ -2,7 +2,7 @@
 
 ## Current Phase
 
-Phase 6 – End-to-End Conversion.
+Version 1 complete.
 
 ---
 
@@ -11,10 +11,8 @@ Phase 6 – End-to-End Conversion.
 ### Project setup
 
 - Created repository structure.
-- Added `README.md`, `SPEC.md`, `AGENTS.md`, and `AGENT_FAILURES.md`.
-- Added `docs/clarifications-v1.md`.
-- Added `docs/clarifications-v2.md`.
-- Added `docs/implementation-plan-v1.md`.
+- Added `README.md`.
+- Added project documentation under `docs/`.
 - Configured `pyproject.toml`.
 - Added `.gitignore`.
 - Set up a local virtual environment.
@@ -37,6 +35,7 @@ Phase 6 – End-to-End Conversion.
   - `Pipeline`
   - `OrderedPipeline`
   - `GeneratedModel`
+  - `ConversionReport`
 
 ### Error handling
 
@@ -103,25 +102,6 @@ Phase 6 – End-to-End Conversion.
 
 **Status:** All validation test cases are passing (`14 passed`).
 
-### Conversion report
-
-- Implemented immutable `ConversionReport` domain model.
-- Implemented report generation for successful conversions.
-- Implemented report generation for failed conversions.
-- Populates generated model filenames in dependency order.
-- Stores C10-formatted error messages.
-- Keeps warnings empty in v1.
-- Supports JSON serialization via `dataclasses.asdict`.
-
-### Conversion report test coverage
-
-- Successful report schema.
-- Successful report model population.
-- Failed report error population.
-- Empty warnings in v1.
-
-**Status:** All conversion report test cases are passing (`4 passed`).
-
 ### Dependency ordering
 
 - Implemented dependency graph construction.
@@ -179,41 +159,90 @@ Phase 6 – End-to-End Conversion.
 
 **Status:** All SQL generation test cases are passing (`15 passed`).
 
+### Conversion report
+
+- Implemented immutable `ConversionReport`.
+- Uses immutable tuples for:
+  - generated model filenames;
+  - errors;
+  - warnings.
+- Implemented report generation for successful conversions.
+- Implemented report generation for failed conversions.
+- Populates generated model filenames in dependency order.
+- Stores formatted conversion errors.
+- Keeps warnings empty in v1.
+- Produces a JSON-serializable report structure.
+
+### Conversion report test coverage
+
+- Successful report schema.
+- Successful report model population.
+- Failed report error population.
+- Empty warnings in v1.
+
+**Status:** All conversion report test cases are passing (`4 passed`).
+
+### End-to-end conversion
+
+- Implemented `convert_pipeline` orchestration.
+- Composes:
+  - parsing;
+  - validation;
+  - dependency ordering;
+  - SQL generation;
+  - conversion reporting.
+- Returns generated models and a success report for valid pipelines.
+- Returns a failed report for expected conversion errors.
+- Implemented JSON pipeline file reading.
+- Implemented generated SQL file writing.
+- Implemented conversion report JSON writing.
+- Exposed the approved public API from the package root.
+
+### End-to-end and file I/O test coverage
+
+- Successful conversion of the canonical example pipeline.
+- Failed conversion report for invalid input.
+- Reading the canonical JSON pipeline from disk.
+- Writing generated SQL models and the conversion report.
+- Complete file-based conversion round trip.
+
+**Status:** All Phase 6 test cases are passing (`5 passed`).
+
 ---
 
 ## In Progress
 
-Phase 6 – End-to-End Conversion.
+None.
 
-Planned scope:
-
-- Implement pipeline JSON file reading.
-- Implement the orchestration API.
-- Compose parsing, validation, ordering, SQL generation, and reporting.
-- Write generated SQL models to disk.
-- Write the conversion report to disk.
-- Add end-to-end conversion tests.
+Version 1 implementation is complete.
 
 ---
 
 ## Next Phase
 
-None.
+Version 2.
 
 ---
 
 ## Not Implemented
 
-- File input and output.
-- End-to-end orchestration.
-- End-to-end conversion tests.
-- Execution and result validation.
+The following features remain outside the completed v1 scope:
+
+- Executing generated SQL.
+- DuckDB-based result validation.
+- Comparing generated and expected datasets.
+- Parsing real Informatica, SSIS, Talend, or IICS formats.
+- Supporting additional transformation types.
+- Generating fully qualified join conditions with relation aliases.
+- Providing a CLI.
+- Building an IDE extension.
+- Integrating directly with an LLM API.
 
 ---
 
 ## Current Status
 
-Phases 1 through 5 are complete:
+All six planned implementation phases are complete:
 
 - Parsing and domain models ✅
 - Validation ✅
@@ -221,5 +250,6 @@ Phases 1 through 5 are complete:
 - Dependency ordering and cycle detection ✅
 - SQL generation ✅
 - Conversion report generation ✅
+- End-to-end conversion and file output ✅
 
-The final milestone for v1 is implementing the complete conversion pipeline and file generation workflow.
+Version 1 of the Legacy ETL to ELT Modernisation Prototype is complete.
