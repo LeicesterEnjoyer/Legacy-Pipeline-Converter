@@ -2,7 +2,7 @@
 
 ## Current Phase
 
-Version 1 complete.
+Version 2.0 – Phase 1: Structured Warnings and Diagnostics.
 
 ---
 
@@ -212,28 +212,56 @@ Version 1 complete.
 
 ## In Progress
 
-None.
+Version 2.0 – Phase 1 – Structured Warnings and Diagnostics
 
-Version 1 implementation is complete.
+Planned scope:
+
+- Add the `WarningInfo` model.
+- Implement deterministic orphan-step diagnostics.
+- Implement structured warning propagation.
+- Update `ConversionReport` to store structured warnings.
+- Add warning JSON serialization.
+- Add Phase 1 test coverage.
 
 ---
 
 ## Next Phase
 
-Version 2.
+Version 2.0 – Phase 2: Source Mapping.
+
+Planned scope:
+
+- Add `SourceMapping`.
+- Add `ResolvedSource`.
+- Implement source-to-relation resolution.
+- Implement fallback relation warnings.
+- Detect conflicting mappings.
+- Integrate source mappings with SQL generation.
 
 ---
 
 ## Not Implemented
 
-The following features remain outside the completed v1 scope:
+The following Version 2 features are not yet implemented:
+
+### Remaining Version 2.0 phases
+
+- Structured warning generation and propagation.
+- Source-to-warehouse relation mappings.
+- Improved SQL generation with aliases and qualified joins.
+- dbt artifact generation (`sources.yml`, `schema.yml`).
+- Adapter extension support.
+
+### Planned Version 2.1 phases
 
 - Executing generated SQL.
 - DuckDB-based result validation.
 - Comparing generated and expected datasets.
+
+### Future versions
+
 - Parsing real Informatica, SSIS, Talend, or IICS formats.
 - Supporting additional transformation types.
-- Generating fully qualified join conditions with relation aliases.
 - Providing a CLI.
 - Building an IDE extension.
 - Integrating directly with an LLM API.
@@ -246,7 +274,6 @@ All six planned implementation phases are complete:
 
 - Parsing and domain models ✅
 - Validation ✅
-- Validation v2 improvements ✅
 - Dependency ordering and cycle detection ✅
 - SQL generation ✅
 - Conversion report generation ✅
