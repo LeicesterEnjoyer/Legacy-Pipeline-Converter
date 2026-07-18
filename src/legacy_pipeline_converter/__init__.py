@@ -1,6 +1,7 @@
 """Legacy ETL pipeline to dbt-style SQL converter."""
 
 from legacy_pipeline_converter.api import convert_pipeline
+from legacy_pipeline_converter.diagnostics import collect_pipeline_warnings
 from legacy_pipeline_converter.ordering import order_steps
 from legacy_pipeline_converter.parser import parse_pipeline
 from legacy_pipeline_converter.report import build_report
@@ -13,5 +14,6 @@ __all__ = [
     "order_steps",
     "generate_models",
     "build_report",
+    "collect_pipeline_warnings",
     "convert_pipeline",
 ]

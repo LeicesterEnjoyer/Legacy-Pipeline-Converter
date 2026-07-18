@@ -2,7 +2,7 @@
 
 ## Current Phase
 
-Version 2.0 – Phase 1: Structured Warnings and Diagnostics.
+Version 2.0 – Phase 2: Source Mapping.
 
 ---
 
@@ -182,6 +182,27 @@ Version 2.0 – Phase 1: Structured Warnings and Diagnostics.
 
 **Status:** All conversion report test cases are passing (`4 passed`).
 
+### Structured warnings and diagnostics
+
+- Implemented immutable `WarningInfo`.
+- Implemented deterministic orphan-step diagnostics.
+- Implemented `collect_pipeline_warnings()`.
+- Detects unreachable (orphan) pipeline steps.
+- Preserves pipeline declaration order for warnings.
+- Integrated structured warnings into `ConversionReport`.
+- Propagates warnings through `convert_pipeline`.
+- Produces JSON-serializable structured warning objects.
+
+### Structured warnings and diagnostics test coverage
+
+- Structured warning population in `ConversionReport`.
+- Warning JSON serialization.
+- No orphan warnings for fully connected pipelines.
+- Orphan-step warning generation.
+- Deterministic orphan warning ordering.
+
+**Status:** All Phase 1 test cases are passing (`5 passed`).
+
 ### End-to-end conversion
 
 - Implemented `convert_pipeline` orchestration.
@@ -212,22 +233,7 @@ Version 2.0 – Phase 1: Structured Warnings and Diagnostics.
 
 ## In Progress
 
-Version 2.0 – Phase 1 – Structured Warnings and Diagnostics
-
-Planned scope:
-
-- Add the `WarningInfo` model.
-- Implement deterministic orphan-step diagnostics.
-- Implement structured warning propagation.
-- Update `ConversionReport` to store structured warnings.
-- Add warning JSON serialization.
-- Add Phase 1 test coverage.
-
----
-
-## Next Phase
-
-Version 2.0 – Phase 2: Source Mapping.
+Version 2.0 – Phase 2: Source Mapping
 
 Planned scope:
 
@@ -240,13 +246,26 @@ Planned scope:
 
 ---
 
+## Next Phase
+
+Version 2.0 – Phase 3: Improved SQL Generation
+
+Planned scope:
+
+- Introduce qualified table aliases.
+- Generate deterministic table aliases.
+- Improve join SQL generation using aliases.
+- Generate fully qualified column references.
+- Preserve deterministic SQL output.
+
+---
+
 ## Not Implemented
 
 The following Version 2 features are not yet implemented:
 
 ### Remaining Version 2.0 phases
 
-- Structured warning generation and propagation.
 - Source-to-warehouse relation mappings.
 - Improved SQL generation with aliases and qualified joins.
 - dbt artifact generation (`sources.yml`, `schema.yml`).
@@ -270,7 +289,9 @@ The following Version 2 features are not yet implemented:
 
 ## Current Status
 
-All six planned implementation phases are complete:
+Version 1 is complete and Version 2 development is underway.
+
+Completed:
 
 - Parsing and domain models ✅
 - Validation ✅
@@ -278,5 +299,4 @@ All six planned implementation phases are complete:
 - SQL generation ✅
 - Conversion report generation ✅
 - End-to-end conversion and file output ✅
-
-Version 1 of the Legacy ETL to ELT Modernisation Prototype is complete.
+- Structured warnings and diagnostics ✅

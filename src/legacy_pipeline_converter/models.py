@@ -62,9 +62,17 @@ class GeneratedModel:
 
 
 @dataclass(frozen=True)
+class WarningInfo:
+    code: str
+    message: str
+    step_id: str | None = None
+    field: str | None = None
+
+
+@dataclass(frozen=True)
 class ConversionReport:
     pipeline_name: str
     status: str
     models_generated: tuple[str, ...]
     errors: tuple[str, ...]
-    warnings: tuple[str, ...]
+    warnings: tuple[WarningInfo, ...]

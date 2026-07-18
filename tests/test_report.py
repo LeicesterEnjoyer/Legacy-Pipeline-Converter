@@ -1,6 +1,6 @@
 from dataclasses import asdict
 
-from legacy_pipeline_converter.models import ConversionReport
+from legacy_pipeline_converter.models import ConversionReport, WarningInfo
 from legacy_pipeline_converter.report import build_report
 
 
@@ -73,13 +73,50 @@ def test_build_report_failure_populates_errors() -> None:
     assert report.warnings == ()
 
 
-def test_build_report_warnings_empty_in_v1() -> None:
+def test_build_report_populates_structured_warnings() -> None:
+    warning = WarningInfo(
+        code="orphan_step",
+        message="Step 'orphan' is not reachable from any output step.",
+        step_id="orphan",
+        field="steps",
+    )
+
     report = build_report(
         pipeline_name="demo",
         status="success",
         models_generated=["valid_orders.sql"],
         errors=[],
-        warnings=["ignored orphan step"],
+        warnings=[warning],
     )
 
-    assert report.warnings == ()
+    assert report.warnings == (warning,)
+
+
+def test_warning_serializes_to_expected_json_object() -> None:
+    warning = WarningInfo(
+        code="orphan_step",
+        message="Step 'orphan' is not reachable from any output step.",
+        step_id="orphan",
+        field="steps",
+    )
+
+    report = build_report(
+        pipeline_name="demo",
+        status="success",
+        models_generated=[],
+        errors=[],
+        warnings=[warning],
+    )
+
+    report_data = asdict(report)
+
+    assert report_data["warnings"] == (
+        {
+            "code": "orphan_step",
+            "message": (
+                "Step 'orphan' is not reachable from any output step."
+            ),
+            "step_id": "orphan",
+            "field": "steps",
+        },
+    )
