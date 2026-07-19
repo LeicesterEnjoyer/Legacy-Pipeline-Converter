@@ -2,7 +2,7 @@
 
 ## Current Phase
 
-Version 2.0 – Phase 2: Source Mapping.
+Version 2.0 – Phase 3: Improved SQL Generation.
 
 ---
 
@@ -182,27 +182,6 @@ Version 2.0 – Phase 2: Source Mapping.
 
 **Status:** All conversion report test cases are passing (`4 passed`).
 
-### Structured warnings and diagnostics
-
-- Implemented immutable `WarningInfo`.
-- Implemented deterministic orphan-step diagnostics.
-- Implemented `collect_pipeline_warnings()`.
-- Detects unreachable (orphan) pipeline steps.
-- Preserves pipeline declaration order for warnings.
-- Integrated structured warnings into `ConversionReport`.
-- Propagates warnings through `convert_pipeline`.
-- Produces JSON-serializable structured warning objects.
-
-### Structured warnings and diagnostics test coverage
-
-- Structured warning population in `ConversionReport`.
-- Warning JSON serialization.
-- No orphan warnings for fully connected pipelines.
-- Orphan-step warning generation.
-- Deterministic orphan warning ordering.
-
-**Status:** All Phase 1 test cases are passing (`5 passed`).
-
 ### End-to-end conversion
 
 - Implemented `convert_pipeline` orchestration.
@@ -231,32 +210,81 @@ Version 2.0 – Phase 2: Source Mapping.
 
 ---
 
-## In Progress
+### Structured warnings and diagnostics
 
-Version 2.0 – Phase 2: Source Mapping
+- Implemented immutable `WarningInfo`.
+- Implemented deterministic orphan-step diagnostics.
+- Implemented `collect_pipeline_warnings()`.
+- Detects unreachable (orphan) pipeline steps.
+- Preserves pipeline declaration order for warnings.
+- Integrated structured warnings into `ConversionReport`.
+- Propagates warnings through `convert_pipeline`.
+- Produces JSON-serializable structured warning objects.
 
-Planned scope:
+### Structured warnings and diagnostics test coverage
 
-- Add `SourceMapping`.
-- Add `ResolvedSource`.
-- Implement source-to-relation resolution.
-- Implement fallback relation warnings.
-- Detect conflicting mappings.
-- Integrate source mappings with SQL generation.
+- Structured warning population in `ConversionReport`.
+- Warning JSON serialization.
+- No orphan warnings for fully connected pipelines.
+- Orphan-step warning generation.
+- Deterministic orphan warning ordering.
+
+**Status:** All Phase 1 test cases are passing (`5 passed`).
+
+### Source mapping
+
+- Implemented immutable `SourceMapping`.
+- Implemented immutable `ResolvedSource`.
+- Implemented immutable `SourceResolution`.
+- Implemented explicit source-to-relation resolution.
+- Supports fully qualified warehouse relation names.
+- Detects conflicting source mappings.
+- Preserves declaration order of resolved sources.
+- Falls back to deterministic relation names derived from source file paths.
+- Emits structured warnings for fallback relation names.
+- Integrated source resolution with SQL generation.
+- Preserves Version 1 SQL generation behavior when no source mappings are supplied.
+
+### Source mapping test coverage
+
+- Explicit source relation mappings.
+- Fully qualified warehouse relation mappings.
+- Deterministic filename fallback relations.
+- Structured fallback relation warnings.
+- Duplicate mapping handling.
+- Conflicting mapping detection.
+- Deterministic declaration order.
+
+**Status:** All Phase 2 test cases are passing (`7 passed`).
 
 ---
 
-## Next Phase
+## In Progress
 
 Version 2.0 – Phase 3: Improved SQL Generation
 
 Planned scope:
 
+- Use resolved source relations throughout SQL generation.
 - Introduce qualified table aliases.
 - Generate deterministic table aliases.
 - Improve join SQL generation using aliases.
 - Generate fully qualified column references.
-- Preserve deterministic SQL output.
+- Produce canonical SQL formatting.
+- Update SQL generation test suite.
+
+---
+
+## Next Phase
+
+Version 2.0 – Phase 4: dbt Artifacts
+
+Planned scope:
+
+- Generate deterministic `sources.yml`.
+- Generate deterministic `schema.yml`.
+- Support optional default materialization configuration.
+- Produce YAML artifact files.
 
 ---
 
@@ -266,8 +294,7 @@ The following Version 2 features are not yet implemented:
 
 ### Remaining Version 2.0 phases
 
-- Source-to-warehouse relation mappings.
-- Improved SQL generation with aliases and qualified joins.
+- Improved SQL generation with deterministic aliases and qualified joins.
 - dbt artifact generation (`sources.yml`, `schema.yml`).
 - Adapter extension support.
 

@@ -11,6 +11,8 @@ This project focuses on:
 - Test-driven development (TDD)
 - AI-assisted software engineering with full human ownership
 
+The project is developed using AI-assisted software engineering while keeping architecture, specifications, and implementation decisions under explicit human control.
+
 ---
 
 ## Goals
@@ -23,11 +25,11 @@ The application should:
 4. Build a dependency graph and determine transformation order.
 5. Generate deterministic dbt-style SQL models.
 6. Generate a conversion report.
-7. Eventually execute transformations and validate results.
+7. Extend the conversion pipeline with execution and result validation capabilities.
 
 ---
 
-## Current Scope (v1)
+## Current Scope (v2.0)
 
 ### Supported transformation types
 
@@ -45,10 +47,14 @@ The application should:
   - missing dependencies;
   - supported join types;
   - at least one output step.
-- Build a dependency graph and topological ordering.
-- Generate deterministic dbt-style SQL files.
+- Build a dependency graph and deterministic topological ordering.
+- Generate deterministic dbt-style SQL models.
+- Generate structured conversion warnings.
+- Detect orphan pipeline steps.
+- Support explicit source-to-relation mappings.
+- Resolve warehouse source relations with deterministic fallbacks.
 - Generate a JSON conversion report.
-- Automated tests for parsing and conversion logic.
+- Automated specification-driven test suite.
 
 ---
 
@@ -130,27 +136,32 @@ legacy-pipeline-converter/
 │   ├── PROJECT_STATE.md               # Current implementation status.
 │   ├── clarifications-v1.md           # Resolved ambiguities for v1.
 │   ├── clarifications-v2.md           # Superseding decisions and enhancements.
-│   └── implementation-plan-v1.md      # Approved architecture and phased test plan.
+│   ├── implementation-plan-v1.md      # Approved architecture and phased test plan.
+│   └── implementation-plan-v2.md      # Version 2 implementation plan.
 ├── generated/                         # Generated artifacts.
 ├── src/
 │   └── legacy_pipeline_converter/
 │       ├── __init__.py                # Package initialization and public exports.
 │       ├── api.py                     # End-to-end conversion orchestration.
+│       ├── diagnostics.py             # Structured warning generation.
 │       ├── errors.py                  # Custom exceptions.
 │       ├── io.py                      # JSON input and generated file output.
 │       ├── models.py                  # Domain and supporting models.
 │       ├── ordering.py                # Dependency graph and deterministic ordering.
 │       ├── parser.py                  # JSON-to-domain parser.
 │       ├── report.py                  # Conversion report generation.
+│       ├── source_mapping.py          # Source-to-relation resolution.
 │       ├── sql_generator.py           # dbt-style SQL model generation.
 │       └── validator.py               # Pipeline validation rules.
 ├── tests/
 │   ├── conftest.py                    # Shared test fixtures.
 │   ├── test_api.py                    # End-to-end conversion tests.
+│   ├── test_diagnostics.py            # Structured warning and diagnostics tests.
 │   ├── test_io.py                     # File input and output tests.
 │   ├── test_ordering.py               # Dependency ordering tests.
 │   ├── test_parser.py                 # Parser tests.
 │   ├── test_report.py                 # Conversion report tests.
+│   ├── test_source_mapping.py         # Source mapping tests.
 │   ├── test_sql_generator.py          # SQL generation tests.
 │   ├── test_validator.py              # Validation tests.
 │   └── fixtures/
@@ -171,14 +182,14 @@ legacy-pipeline-converter/
 
 ## Current Status
 
-See:
+Version 1 is complete.
+
+Version 2 is currently under active development.
+
+For implementation progress and architecture, see:
 
 - `docs/PROJECT_STATE.md`
-- `docs/implementation-plan-v1.md`
-- `docs/clarifications-v1.md`
-- `docs/clarifications-v2.md`
-
-for implementation progress and design decisions.
+- `docs/implementation-plan-v2.md`
 
 ---
 
@@ -220,9 +231,11 @@ pytest
 
 ## Planned Future Work
 
+- Improved SQL generation with qualified aliases
+- dbt artifact generation (`sources.yml`, `schema.yml`)
+- Adapter abstraction for future ETL vendors
 - DuckDB execution engine
-- Result validation and data comparison
+- Result validation and dataset comparison
 - Additional transformation types
 - Real ETL formats (Informatica, SSIS, Talend, IICS)
 - IDE extension
-- Improved reporting and diagnostics

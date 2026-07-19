@@ -70,6 +70,27 @@ class WarningInfo:
 
 
 @dataclass(frozen=True)
+class SourceMapping:
+    source_id: str
+    relation: str
+    database: str | None = None
+    schema: str | None = None
+
+
+@dataclass(frozen=True)
+class ResolvedSource:
+    source_id: str
+    relation_name: str
+    used_fallback: bool
+
+
+@dataclass(frozen=True)
+class SourceResolution:
+    sources: tuple[ResolvedSource, ...]
+    warnings: tuple[WarningInfo, ...]
+
+
+@dataclass(frozen=True)
 class ConversionReport:
     pipeline_name: str
     status: str

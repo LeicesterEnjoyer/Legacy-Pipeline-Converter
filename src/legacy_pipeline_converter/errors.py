@@ -43,3 +43,11 @@ class CyclicDependencyError(ValidationError):
 
 class DuplicateStepIdError(ValidationError):
     """Raised when multiple steps share the same id."""
+
+
+class SourceMappingError(ConversionError):
+    """Base class for fatal source-mapping configuration errors."""
+
+
+class ConflictingSourceMappingError(SourceMappingError):
+    """Raised when one source id has multiple different mappings."""

@@ -157,3 +157,41 @@ The orphan-warning test was moved from `test_report.py` to the dedicated diagnos
 ### Lesson learned
 
 Do not assume that implementing production code completes a phase.
+
+---
+
+## F-005: SQL tests were introduced before the scheduled implementation phase
+
+### Related specification
+
+- [Phase 2 – Source mapping](implementation-plan-v2.md#phase-2-source-mapping)
+- [Phase 3 – Improved SQL generation](implementation-plan-v2.md#phase-3-improved-sql-generation)
+
+### Context
+
+While implementing Phase 2, the AI proposed adding and updating SQL generation tests to verify the new source mapping behavior.
+
+### Why it was a problem
+
+The approved implementation plan explicitly separates the responsibilities of the two phases:
+
+- **Phase 2** introduces source mapping models, resolution logic, conflict detection, fallback behavior, and integration with the SQL generator.
+- **Phase 3** updates SQL generation behavior and the corresponding SQL test suite.
+
+By introducing new SQL tests during Phase 2, the AI crossed the agreed phase boundary and attempted to validate functionality scheduled for a later implementation phase.
+
+This also conflicted with the incremental development approach of the project, where each phase should modify only the components assigned to that phase.
+
+### Resolution
+
+Deferred all SQL test additions and modifications until Phase 3.
+
+During Phase 2:
+
+- `generate_models()` remains backward compatible when no `SourceResolution` is supplied;
+- existing SQL tests remain unchanged;
+- only source mapping functionality and its dedicated test suite are implemented.
+
+### Lesson learned
+
+Before proposing new tests or modifying existing ones, verify that they belong to the current implementation phase defined by the authoritative implementation plan.
