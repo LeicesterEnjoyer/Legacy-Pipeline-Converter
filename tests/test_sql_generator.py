@@ -8,8 +8,10 @@ from legacy_pipeline_converter.models import (
     OutputStep,
     Pipeline,
     SourceStep,
+    SourceMapping,
 )
 from legacy_pipeline_converter.ordering import order_steps
+from legacy_pipeline_converter.source_mapping import resolve_source_mappings
 from legacy_pipeline_converter.sql_generator import generate_models, source_relation_name
 
 
@@ -56,7 +58,7 @@ def test_generate_filter_step_sql(ordered_pipeline: OrderedPipeline) -> None:
     models = generate_models(ordered_pipeline)
     filter_model = next(model for model in models if model.step_id == "valid_orders")
 
-    assert "SELECT * FROM orders" in filter_model.sql
+    assert "FROM orders" in filter_model.sql
     assert "WHERE status != 'cancelled'" in filter_model.sql
 
 
@@ -91,14 +93,14 @@ def test_generate_join_step_sql(join_type: str) -> None:
     join_model = next(model for model in models if model.step_id == "joined")
 
     assert f"{join_type.upper()} JOIN" in join_model.sql
-    assert "ON id = id" in join_model.sql
+    assert "ON left_relation.id = right_relation.id" in join_model.sql
 
 
 def test_generate_output_step_sql(ordered_pipeline: OrderedPipeline) -> None:
     models = generate_models(ordered_pipeline)
     output_model = next(model for model in models if model.step_id == "final_output")
 
-    assert "SELECT * FROM {{ ref('enriched_orders') }}" in output_model.sql
+    assert "FROM {{ ref('enriched_orders') }}" in output_model.sql
 
 
 def test_generate_uses_ref_for_transformed_upstream(ordered_pipeline: OrderedPipeline) -> None:
@@ -114,6 +116,88 @@ def test_generate_uses_source_relation_name_for_source_upstream(ordered_pipeline
 
     assert "FROM orders" in filter_model.sql
     assert "{{ ref('" not in filter_model.sql
+
+
+def test_generate_filter_uses_mapped_source_relation(ordered_pipeline: OrderedPipeline) -> None:
+    resolution = resolve_source_mappings(
+        ordered_pipeline.pipeline,
+        [
+            SourceMapping(
+                source_id="orders_source",
+                relation="orders",
+                database="analytics",
+                schema="raw",
+            ),
+            SourceMapping(source_id="customers_source", relation="customers"),
+        ],
+    )
+
+    models = generate_models(ordered_pipeline, resolution)
+    filter_model = next(model for model in models if model.step_id == "valid_orders")
+
+    assert filter_model.sql == (
+        "SELECT *\n"
+        "FROM analytics.raw.orders\n"
+        "WHERE status != 'cancelled'\n"
+    )
+
+
+def test_generate_join_uses_fixed_aliases(ordered_pipeline: OrderedPipeline) -> None:
+    models = generate_models(ordered_pipeline)
+    join_model = next(model for model in models if model.step_id == "enriched_orders")
+
+    assert "FROM {{ ref('orders_with_revenue') }} AS left_relation\n" in join_model.sql
+    assert "LEFT JOIN customers AS right_relation\n" in join_model.sql
+
+
+def test_generate_join_uses_qualified_key_references(ordered_pipeline: OrderedPipeline) -> None:
+    models = generate_models(ordered_pipeline)
+    join_model = next(model for model in models if model.step_id == "enriched_orders")
+
+    assert "    ON left_relation.customer_id = right_relation.id\n" in join_model.sql
+
+
+def test_generate_join_with_transformed_and_source_upstreams() -> None:
+    pipeline = Pipeline(
+        name="mixed_join",
+        steps=(
+            SourceStep(id="orders_source", path="orders.csv"),
+            FilterStep(id="valid_orders", input="orders_source", condition="status = 'ok'"),
+            SourceStep(id="customers_source", path="customers.csv"),
+            JoinStep(
+                id="joined",
+                left="valid_orders",
+                right="customers_source",
+                left_key="customer_id",
+                right_key="id",
+                join_type="inner",
+            ),
+            OutputStep(id="out", input="joined", table="out"),
+        ),
+    )
+    resolution = resolve_source_mappings(
+        pipeline,
+        [SourceMapping(source_id="customers_source", relation="raw.customers")],
+    )
+
+    models = generate_models(order_steps(pipeline), resolution)
+    join_model = next(model for model in models if model.step_id == "joined")
+
+    assert "FROM {{ ref('valid_orders') }} AS left_relation\n" in join_model.sql
+    assert "INNER JOIN raw.customers AS right_relation\n" in join_model.sql
+
+
+def test_generate_sql_uses_canonical_formatting(ordered_pipeline: OrderedPipeline) -> None:
+    models = generate_models(ordered_pipeline)
+    join_model = next(model for model in models if model.step_id == "enriched_orders")
+
+    assert join_model.sql == (
+        "SELECT *\n"
+        "FROM {{ ref('orders_with_revenue') }} AS left_relation\n"
+        "LEFT JOIN customers AS right_relation\n"
+        "    ON left_relation.customer_id = right_relation.id\n"
+    )
+    assert not any(line.endswith(" ") for line in join_model.sql.splitlines())
 
 
 def test_source_relation_name_strips_nested_path_and_extension() -> None:
@@ -153,9 +237,8 @@ def test_generate_example_pipeline_models(ordered_pipeline: OrderedPipeline) -> 
     assert any("{{ ref('enriched_orders') }}" in model.sql for model in models)
 
 
-def test_generate_is_deterministic(ordered_pipeline: OrderedPipeline) -> None:
+def test_generate_sql_is_byte_deterministic(ordered_pipeline: OrderedPipeline) -> None:
     first = generate_models(ordered_pipeline)
     second = generate_models(ordered_pipeline)
 
     assert first == second
-    

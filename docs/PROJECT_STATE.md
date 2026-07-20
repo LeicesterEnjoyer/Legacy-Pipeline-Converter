@@ -2,7 +2,7 @@
 
 ## Current Phase
 
-Version 2.0 – Phase 3: Improved SQL Generation.
+Version 2.0 – Phase 4: dbt Artifacts.
 
 ---
 
@@ -139,6 +139,9 @@ Version 2.0 – Phase 3: Improved SQL Generation.
 - Generates filenames using `<step_id>.sql`.
 - Generates models in dependency order.
 - Excludes dbt `config()` blocks.
+- Uses deterministic `left_relation` and `right_relation` aliases for joins.
+- Qualifies join predicates with their generated aliases.
+- Uses canonical clause-per-line formatting with one trailing newline.
 - Returns generated models as an immutable tuple.
 
 ### SQL generation test coverage
@@ -155,9 +158,9 @@ Version 2.0 – Phase 3: Improved SQL Generation.
 - Deterministic model filenames.
 - Absence of dbt `config()` blocks.
 - Canonical example pipeline models.
-- Deterministic SQL generation.
+- Deterministic SQL generation, including byte-identical canonical formatting.
 
-**Status:** All SQL generation test cases are passing (`15 passed`).
+**Status:** All SQL generation test cases are passing (`20 passed`).
 
 ### Conversion report
 
@@ -261,22 +264,6 @@ Version 2.0 – Phase 3: Improved SQL Generation.
 
 ## In Progress
 
-Version 2.0 – Phase 3: Improved SQL Generation
-
-Planned scope:
-
-- Use resolved source relations throughout SQL generation.
-- Introduce qualified table aliases.
-- Generate deterministic table aliases.
-- Improve join SQL generation using aliases.
-- Generate fully qualified column references.
-- Produce canonical SQL formatting.
-- Update SQL generation test suite.
-
----
-
-## Next Phase
-
 Version 2.0 – Phase 4: dbt Artifacts
 
 Planned scope:
@@ -288,13 +275,25 @@ Planned scope:
 
 ---
 
+## Next Phase
+
+Version 2.0 – Phase 5: Adapter Design
+
+Planned scope:
+
+- Implement the `PipelineAdapter` protocol.
+- Implement the default `JsonPipelineAdapter`.
+- Preserve compatibility with the existing Version 1 JSON input format.
+- Add extension points for future vendor-specific adapters
+
+---
+
 ## Not Implemented
 
 The following Version 2 features are not yet implemented:
 
 ### Remaining Version 2.0 phases
 
-- Improved SQL generation with deterministic aliases and qualified joins.
 - dbt artifact generation (`sources.yml`, `schema.yml`).
 - Adapter extension support.
 
@@ -327,3 +326,4 @@ Completed:
 - Conversion report generation ✅
 - End-to-end conversion and file output ✅
 - Structured warnings and diagnostics ✅
+- Improved SQL generation with deterministic aliases and qualified joins ✅

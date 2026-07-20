@@ -22,7 +22,9 @@ def _step_lookup(pipeline: Pipeline) -> dict[str, Step]:
     return {step.id: step for step in pipeline.steps}
 
 
-def _source_relation_lookup(source_resolution: SourceResolution | None) -> dict[str, str]:
+def _source_relation_lookup(
+    source_resolution: SourceResolution | None,
+) -> dict[str, str]:
     if source_resolution is None:
         return {}
 
@@ -32,8 +34,11 @@ def _source_relation_lookup(source_resolution: SourceResolution | None) -> dict[
     }
 
 
-def _upstream_sql(step_id: str, ordered_pipeline: OrderedPipeline, source_relations: dict[str, str]) -> str:
-    step_lookup = _step_lookup(ordered_pipeline.pipeline)
+def _upstream_relation(
+    step_id: str,
+    step_lookup: dict[str, Step],
+    source_relations: dict[str, str],
+) -> str:
     upstream_step = step_lookup[step_id]
 
     if isinstance(upstream_step, SourceStep):
@@ -45,7 +50,10 @@ def _upstream_sql(step_id: str, ordered_pipeline: OrderedPipeline, source_relati
     return f"{{{{ ref('{upstream_step.id}') }}}}"
 
 
-def generate_models(ordered_pipeline: OrderedPipeline, source_resolution: SourceResolution | None = None) -> tuple[GeneratedModel, ...]:
+def generate_models(
+    ordered_pipeline: OrderedPipeline,
+    source_resolution: SourceResolution | None = None,
+) -> tuple[GeneratedModel, ...]:
     models: list[GeneratedModel] = []
     step_lookup = _step_lookup(ordered_pipeline.pipeline)
     source_relations = _source_relation_lookup(source_resolution)
@@ -58,41 +66,43 @@ def generate_models(ordered_pipeline: OrderedPipeline, source_resolution: Source
 
         if isinstance(step, FilterStep):
             sql = (
-                f"SELECT * FROM "
-                f"{_upstream_sql(step.input, ordered_pipeline, source_relations)}\n"
-                f"WHERE {step.condition}"
+                "SELECT *\n"
+                f"FROM {_upstream_relation(step.input, step_lookup, source_relations)}\n"
+                f"WHERE {step.condition}\n"
             )
 
         elif isinstance(step, CalculatedColumnStep):
             sql = (
-                f"SELECT *, {step.expression} AS {step.column} "
-                f"FROM "
-                f"{_upstream_sql(step.input, ordered_pipeline, source_relations)}"
+                f"SELECT *, {step.expression} AS {step.column}\n"
+                f"FROM {_upstream_relation(step.input, step_lookup, source_relations)}\n"
             )
 
         elif isinstance(step, JoinStep):
             join_type = step.join_type.upper()
-            left_sql = _upstream_sql(
+
+            left_relation = _upstream_relation(
                 step.left,
-                ordered_pipeline,
+                step_lookup,
                 source_relations,
             )
-            right_sql = _upstream_sql(
+            right_relation = _upstream_relation(
                 step.right,
-                ordered_pipeline,
+                step_lookup,
                 source_relations,
             )
 
             sql = (
-                f"SELECT * FROM {left_sql}\n"
-                f"{join_type} JOIN {right_sql}\n"
-                f"ON {step.left_key} = {step.right_key}"
+                "SELECT *\n"
+                f"FROM {left_relation} AS left_relation\n"
+                f"{join_type} JOIN {right_relation} AS right_relation\n"
+                f"    ON left_relation.{step.left_key} = "
+                f"right_relation.{step.right_key}\n"
             )
 
         elif isinstance(step, OutputStep):
             sql = (
-                f"SELECT * FROM "
-                f"{_upstream_sql(step.input, ordered_pipeline, source_relations)}"
+                "SELECT *\n"
+                f"FROM {_upstream_relation(step.input, step_lookup, source_relations)}\n"
             )
 
         else:
