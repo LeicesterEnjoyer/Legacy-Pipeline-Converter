@@ -135,7 +135,6 @@ legacy-pipeline-converter/
 │   ├── AGENT_FAILURES.md              # Lessons learned from AI-assisted development.
 │   ├── PROJECT_STATE.md               # Current implementation status.
 │   ├── clarifications-v1.md           # Resolved ambiguities for v1.
-│   ├── clarifications-v2.md           # Superseding decisions and enhancements.
 │   ├── implementation-plan-v1.md      # Approved architecture and phased test plan.
 │   └── implementation-plan-v2.md      # Version 2 implementation plan.
 ├── generated/                         # Generated artifacts.
