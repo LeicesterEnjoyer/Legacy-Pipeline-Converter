@@ -23,7 +23,7 @@ The application should:
 2. Parse supported transformation types.
 3. Validate pipeline definitions.
 4. Build a dependency graph and determine transformation order.
-5. Generate deterministic dbt-style SQL models.
+5. Generate deterministic dbt-style SQL models and dbt project artifacts.
 6. Generate a conversion report.
 7. Extend the conversion pipeline with execution and result validation capabilities.
 
@@ -53,12 +53,14 @@ The application should:
 - Detect orphan pipeline steps.
 - Support explicit source-to-relation mappings.
 - Resolve warehouse source relations with deterministic fallbacks.
+- Generate deterministic dbt artifacts (`sources.yml`, `schema.yml`).
+- Support configurable default dbt model materialization.
 - Generate a JSON conversion report.
 - Automated specification-driven test suite.
 
 ---
 
-## Out of Scope (v1)
+## Out of Scope
 
 - Real Informatica, SSIS, Talend, or IICS formats
 - Cloud warehouse deployment
@@ -142,6 +144,7 @@ legacy-pipeline-converter/
 │   └── legacy_pipeline_converter/
 │       ├── __init__.py                # Package initialization and public exports.
 │       ├── api.py                     # End-to-end conversion orchestration.
+│       ├── dbt_artifacts.py           # dbt YAML artifact generation.
 │       ├── diagnostics.py             # Structured warning generation.
 │       ├── errors.py                  # Custom exceptions.
 │       ├── io.py                      # JSON input and generated file output.
@@ -155,6 +158,7 @@ legacy-pipeline-converter/
 ├── tests/
 │   ├── conftest.py                    # Shared test fixtures.
 │   ├── test_api.py                    # End-to-end conversion tests.
+│   ├── test_dbt_artifacts.py          # dbt artifact generation tests.
 │   ├── test_diagnostics.py            # Structured warning and diagnostics tests.
 │   ├── test_io.py                     # File input and output tests.
 │   ├── test_ordering.py               # Dependency ordering tests.
@@ -230,8 +234,6 @@ pytest
 
 ## Planned Future Work
 
-- Improved SQL generation with qualified aliases
-- dbt artifact generation (`sources.yml`, `schema.yml`)
 - Adapter abstraction for future ETL vendors
 - DuckDB execution engine
 - Result validation and dataset comparison

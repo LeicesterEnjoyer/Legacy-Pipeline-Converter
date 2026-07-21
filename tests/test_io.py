@@ -3,11 +3,13 @@ from pathlib import Path
 
 from legacy_pipeline_converter.io import (
     read_pipeline_json,
+    write_dbt_artifacts,
     write_report,
     write_sql_models,
 )
 from legacy_pipeline_converter.models import (
     ConversionReport,
+    GeneratedArtifact,
     GeneratedModel,
 )
 
@@ -72,3 +74,27 @@ def test_write_sql_models_and_report_creates_files(tmp_path: Path) -> None:
         "errors": [],
         "warnings": [],
     }
+
+
+def test_write_dbt_artifacts_creates_yaml_files(tmp_path: Path) -> None:
+    artifacts = (
+        GeneratedArtifact(
+            filename="sources.yml",
+            content="version: 2\nsources: []\n",
+            artifact_type="sources_yml",
+        ),
+        GeneratedArtifact(
+            filename="schema.yml",
+            content="version: 2\nmodels: []\n",
+            artifact_type="schema_yml",
+        ),
+    )
+
+    write_dbt_artifacts(tmp_path, artifacts)
+
+    assert (tmp_path / "sources.yml").read_text(encoding="utf-8") == (
+        "version: 2\nsources: []\n"
+    )
+    assert (tmp_path / "schema.yml").read_text(encoding="utf-8") == (
+        "version: 2\nmodels: []\n"
+    )

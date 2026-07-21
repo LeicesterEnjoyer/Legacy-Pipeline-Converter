@@ -2,7 +2,7 @@
 
 ## Current Phase
 
-Version 2.0 – Phase 4: dbt Artifacts.
+Version 2.0 – Phase 5: Adapter Extension Contract.
 
 ---
 
@@ -262,29 +262,54 @@ Version 2.0 – Phase 4: dbt Artifacts.
 
 ---
 
-## In Progress
+### dbt artifacts
 
-Version 2.0 – Phase 4: dbt Artifacts
+- Implemented immutable `GeneratedArtifact`.
+- Implemented immutable `DbtGenerationConfig`.
+- Generates deterministic `sources.yml` and `schema.yml` artifacts.
+- Groups resolved sources by database and schema.
+- Preserves source declaration order within generated table lists.
+- Includes filename-derived fallback relations.
+- Preserves generated model order in `schema.yml`.
+- Supports configurable default `view` or `table` materialization.
+- Writes generated YAML artifacts through the file I/O layer.
+- Exposes `generate_dbt_artifacts()` from the package root.
 
-Planned scope:
+### dbt artifact test coverage
 
-- Generate deterministic `sources.yml`.
-- Generate deterministic `schema.yml`.
-- Support optional default materialization configuration.
-- Produce YAML artifact files.
+- Resolved and fallback source relations in `sources.yml`.
+- Deterministic `sources.yml` generation.
+- Generated model order in `schema.yml`.
+- Configurable default materialization.
+- YAML artifact file writing.
+
+**Status:** All Phase 4 test cases are passing (`5 passed`).
 
 ---
 
-## Next Phase
+## In Progress
 
-Version 2.0 – Phase 5: Adapter Design
+Version 2.0 – Phase 5: Adapter Extension Contract
 
 Planned scope:
 
 - Implement the `PipelineAdapter` protocol.
 - Implement the default `JsonPipelineAdapter`.
 - Preserve compatibility with the existing Version 1 JSON input format.
-- Add extension points for future vendor-specific adapters
+- Add extension points for future vendor-specific adapters.
+
+---
+
+## Next Phase
+
+Version 2.0 – Phase 6: v2.0 Integration
+
+Planned scope:
+
+- Introduce the immutable `ConversionResult`.
+- Integrate diagnostics, source mappings, SQL models, and dbt artifacts.
+- Preserve Version 1 JSON compatibility.
+- Add deterministic end-to-end Version 2 conversion coverage.
 
 ---
 
@@ -294,8 +319,8 @@ The following Version 2 features are not yet implemented:
 
 ### Remaining Version 2.0 phases
 
-- dbt artifact generation (`sources.yml`, `schema.yml`).
 - Adapter extension support.
+- Version 2.0 end-to-end integration.
 
 ### Planned Version 2.1 phases
 
@@ -327,3 +352,4 @@ Completed:
 - End-to-end conversion and file output ✅
 - Structured warnings and diagnostics ✅
 - Improved SQL generation with deterministic aliases and qualified joins ✅
+- Deterministic dbt artifact generation ✅

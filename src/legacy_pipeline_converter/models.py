@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from typing import Literal
 
 
 @dataclass(frozen=True)
@@ -59,6 +60,18 @@ class GeneratedModel:
     step_id: str
     filename: str
     sql: str
+
+
+@dataclass(frozen=True)
+class GeneratedArtifact:
+    filename: str
+    content: str
+    artifact_type: Literal["sources_yml", "schema_yml"]
+
+
+@dataclass(frozen=True)
+class DbtGenerationConfig:
+    default_materialization: Literal["view", "table"] = "view"
 
 
 @dataclass(frozen=True)

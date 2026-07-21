@@ -3,7 +3,7 @@ from dataclasses import asdict
 from pathlib import Path
 from typing import Any, Iterable
 
-from .models import ConversionReport, GeneratedModel
+from .models import ConversionReport, GeneratedArtifact, GeneratedModel
 
 
 def read_pipeline_json(path: str | Path) -> dict[str, Any]:
@@ -20,6 +20,18 @@ def write_sql_models(directory: str | Path, models: Iterable[GeneratedModel]) ->
     for model in models:
         output_path = output_directory / model.filename
         output_path.write_text(model.sql, encoding="utf-8")
+
+
+def write_dbt_artifacts(
+    directory: str | Path,
+    artifacts: Iterable[GeneratedArtifact],
+) -> None:
+    output_directory = Path(directory)
+    output_directory.mkdir(parents=True, exist_ok=True)
+
+    for artifact in artifacts:
+        output_path = output_directory / artifact.filename
+        output_path.write_text(artifact.content, encoding="utf-8")
 
 
 def write_report(path: str | Path, report: ConversionReport) -> None:
