@@ -1,5 +1,6 @@
 import json
 from pathlib import Path
+from typing import Any
 
 from legacy_pipeline_converter.api import convert_pipeline
 from legacy_pipeline_converter.io import (
@@ -58,6 +59,28 @@ def test_convert_pipeline_invalid_input_returns_failed_report() -> None:
     assert report.status == "failed"
     assert len(report.errors) == 1
     assert "missing_source" in report.errors[0]
+
+
+def test_convert_pipeline_uses_supplied_adapter(
+    example_pipeline_data: dict,
+) -> None:
+    class RecordingAdapter:
+        def __init__(self) -> None:
+            self.received_source: object | None = None
+
+        def normalize(self, source: object) -> dict[str, Any]:
+            self.received_source = source
+            return example_pipeline_data
+
+    source = object()
+    adapter = RecordingAdapter()
+
+    ordered, models, report = convert_pipeline(source, adapter=adapter)
+
+    assert adapter.received_source is source
+    assert ordered is not None
+    assert len(models) == 4
+    assert report.status == "success"
 
 
 def test_end_to_end_file_round_trip(tmp_path: Path) -> None:

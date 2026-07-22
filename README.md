@@ -1,6 +1,6 @@
 # Legacy ETL to ELT Modernisation Prototype
 
-A Python prototype that converts simplified legacy ETL pipeline definitions into modern ELT-style transformations and generates deterministic dbt-style SQL models.
+A Python prototype that converts simplified legacy ETL pipeline definitions into modern ELT-style transformations and generates deterministic dbt-style SQL models and YAML artifacts.
 
 This project focuses on:
 
@@ -41,7 +41,10 @@ The application should:
 
 ### Features
 
-- Parse pipeline definitions from JSON.
+- Normalize pipeline input through an explicit adapter contract.
+- Support the existing JSON dictionary format through the default `JsonPipelineAdapter`.
+- Support custom adapter injection for future vendor-specific formats.
+- Parse normalized pipeline definitions.
 - Validate:
   - unique step IDs;
   - missing dependencies;
@@ -56,13 +59,13 @@ The application should:
 - Generate deterministic dbt artifacts (`sources.yml`, `schema.yml`).
 - Support configurable default dbt model materialization.
 - Generate a JSON conversion report.
-- Automated specification-driven test suite.
+- Provide an automated specification-driven test suite.
 
 ---
 
 ## Out of Scope
 
-- Real Informatica, SSIS, Talend, or IICS formats
+- Real Informatica, SSIS, Talend, or IICS parsers
 - Cloud warehouse deployment
 - Frontend or UI
 - Arbitrary SQL conversion
@@ -139,9 +142,13 @@ legacy-pipeline-converter/
 │   ├── clarifications-v1.md           # Resolved ambiguities for v1.
 │   ├── implementation-plan-v1.md      # Approved architecture and phased test plan.
 │   └── implementation-plan-v2.md      # Version 2 implementation plan.
-├── generated/                         # Generated artifacts.
+├── generated/                         # Generated SQL, YAML, and report artifacts.
 ├── src/
 │   └── legacy_pipeline_converter/
+│       ├── adapters/
+│       │   ├── __init__.py            # Adapter package exports.
+│       │   ├── base.py                # Pipeline adapter protocol.
+│       │   └── json_adapter.py        # Default JSON dictionary adapter.
 │       ├── __init__.py                # Package initialization and public exports.
 │       ├── api.py                     # End-to-end conversion orchestration.
 │       ├── dbt_artifacts.py           # dbt YAML artifact generation.
@@ -150,13 +157,14 @@ legacy-pipeline-converter/
 │       ├── io.py                      # JSON input and generated file output.
 │       ├── models.py                  # Domain and supporting models.
 │       ├── ordering.py                # Dependency graph and deterministic ordering.
-│       ├── parser.py                  # JSON-to-domain parser.
+│       ├── parser.py                  # Dictionary-to-domain parser.
 │       ├── report.py                  # Conversion report generation.
 │       ├── source_mapping.py          # Source-to-relation resolution.
 │       ├── sql_generator.py           # dbt-style SQL model generation.
 │       └── validator.py               # Pipeline validation rules.
 ├── tests/
 │   ├── conftest.py                    # Shared test fixtures.
+│   ├── test_adapters.py               # Adapter contract and normalization tests.
 │   ├── test_api.py                    # End-to-end conversion tests.
 │   ├── test_dbt_artifacts.py          # dbt artifact generation tests.
 │   ├── test_diagnostics.py            # Structured warning and diagnostics tests.
@@ -185,9 +193,19 @@ legacy-pipeline-converter/
 
 ## Current Status
 
+## Current Status
+
 Version 1 is complete.
 
-Version 2 is currently under active development.
+Version 2.0 is currently under active development.
+
+Completed Version 2.0 phases:
+
+- Structured warnings and diagnostics
+- Source mapping and deterministic fallback resolution
+- Improved SQL generation
+- dbt artifact generation
+- Adapter extension contract and default JSON adapter
 
 For implementation progress and architecture, see:
 
@@ -234,9 +252,10 @@ pytest
 
 ## Planned Future Work
 
-- Adapter abstraction for future ETL vendors
+- Version 2.0 end-to-end integration
 - DuckDB execution engine
 - Result validation and dataset comparison
+- Vendor-specific adapter implementations
 - Additional transformation types
 - Real ETL formats (Informatica, SSIS, Talend, IICS)
 - IDE extension

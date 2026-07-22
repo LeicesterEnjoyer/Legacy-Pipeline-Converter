@@ -2,7 +2,7 @@
 
 ## Current Phase
 
-Version 2.0 – Phase 5: Adapter Extension Contract.
+Version 2.0 – Phase 6: v2.0 Integration.
 
 ---
 
@@ -287,20 +287,28 @@ Version 2.0 – Phase 5: Adapter Extension Contract.
 
 ---
 
-## In Progress
+### Adapter extension contract
 
-Version 2.0 – Phase 5: Adapter Extension Contract
+- Implemented the runtime-checkable `PipelineAdapter` protocol.
+- Implemented the default `JsonPipelineAdapter`.
+- Preserves the existing dictionary-based JSON input format.
+- Rejects unsupported default-adapter source types with a clear parse error.
+- Supports explicit adapter injection through `convert_pipeline()`.
+- Keeps adapter normalization separate from domain parsing.
+- Leaves vendor-specific adapter implementations out of scope.
 
-Planned scope:
+### Adapter test coverage
 
-- Implement the `PipelineAdapter` protocol.
-- Implement the default `JsonPipelineAdapter`.
-- Preserve compatibility with the existing Version 1 JSON input format.
-- Add extension points for future vendor-specific adapters.
+- Existing dictionary normalization.
+- Explicit protocol conformance through `normalize()`.
+- Unsupported default-adapter source types.
+- High-level API delegation to a supplied adapter.
+
+**Status:** All Phase 5 test cases are passing (`4 passed`).
 
 ---
 
-## Next Phase
+## In Progress
 
 Version 2.0 – Phase 6: v2.0 Integration
 
@@ -313,13 +321,25 @@ Planned scope:
 
 ---
 
+## Next Phase
+
+Version 2.1 – Phase 7: DuckDB Rendering and Execution
+
+Planned scope:
+
+- Render generated dbt references for local execution.
+- Register CSV sources in DuckDB.
+- Execute generated models in dependency order.
+- Return the selected output relation.
+
+---
+
 ## Not Implemented
 
 The following Version 2 features are not yet implemented:
 
 ### Remaining Version 2.0 phases
 
-- Adapter extension support.
 - Version 2.0 end-to-end integration.
 
 ### Planned Version 2.1 phases
@@ -353,3 +373,4 @@ Completed:
 - Structured warnings and diagnostics ✅
 - Improved SQL generation with deterministic aliases and qualified joins ✅
 - Deterministic dbt artifact generation ✅
+- Adapter extension contract and default JSON adapter ✅

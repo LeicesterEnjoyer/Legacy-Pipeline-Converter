@@ -1,5 +1,6 @@
 from typing import Any
 
+from .adapters import JsonPipelineAdapter, PipelineAdapter
 from .diagnostics import collect_pipeline_warnings
 from .errors import ConversionError
 from .models import (
@@ -15,13 +16,23 @@ from .validator import validate_pipeline
 
 
 def convert_pipeline(
-    data: dict[str, Any],
+    source: object,
+    *,
+    adapter: PipelineAdapter | None = None,
 ) -> tuple[
     OrderedPipeline | None,
     tuple[GeneratedModel, ...],
     ConversionReport,
 ]:
+    data: dict[str, Any] = {}
+
     try:
+        selected_adapter = (
+            adapter
+            if adapter is not None
+            else JsonPipelineAdapter()
+        )
+        data = selected_adapter.normalize(source)
         parsed_pipeline = parse_pipeline(data)
         validated_pipeline = validate_pipeline(parsed_pipeline)
         warnings = collect_pipeline_warnings(validated_pipeline)
