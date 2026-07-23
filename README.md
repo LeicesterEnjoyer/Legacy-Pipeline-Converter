@@ -24,7 +24,7 @@ The application should:
 3. Validate pipeline definitions.
 4. Build a dependency graph and determine transformation order.
 5. Generate deterministic dbt-style SQL models and dbt project artifacts.
-6. Generate a conversion report.
+6. Produce a unified conversion result containing generated models, dbt artifacts, and a conversion report.
 7. Extend the conversion pipeline with execution and result validation capabilities.
 
 ---
@@ -60,6 +60,7 @@ The application should:
 - Support configurable default dbt model materialization.
 - Generate a JSON conversion report.
 - Provide an automated specification-driven test suite.
+- Integrate parsing, validation, diagnostics, source resolution, SQL generation, dbt artifact generation, and reporting through a unified conversion API.
 
 ---
 
@@ -193,19 +194,11 @@ legacy-pipeline-converter/
 
 ## Current Status
 
-## Current Status
-
 Version 1 is complete.
 
-Version 2.0 is currently under active development.
+Version 2.0 is complete.
 
-Completed Version 2.0 phases:
-
-- Structured warnings and diagnostics
-- Source mapping and deterministic fallback resolution
-- Improved SQL generation
-- dbt artifact generation
-- Adapter extension contract and default JSON adapter
+Version 2.1 is currently under active development.
 
 For implementation progress and architecture, see:
 
@@ -252,7 +245,6 @@ pytest
 
 ## Planned Future Work
 
-- Version 2.0 end-to-end integration
 - DuckDB execution engine
 - Result validation and dataset comparison
 - Vendor-specific adapter implementations

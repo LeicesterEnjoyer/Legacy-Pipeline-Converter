@@ -2,7 +2,7 @@
 
 ## Current Phase
 
-Version 2.0 – Phase 6: v2.0 Integration.
+Version 2.1 – Phase 7: DuckDB Rendering and Execution.
 
 ---
 
@@ -209,7 +209,7 @@ Version 2.0 – Phase 6: v2.0 Integration.
 - Writing generated SQL models and the conversion report.
 - Complete file-based conversion round trip.
 
-**Status:** All Phase 6 test cases are passing (`5 passed`).
+**Status:** All Version 1 end-to-end and file I/O tests are passing (`5 passed`).
 
 ---
 
@@ -308,20 +308,31 @@ Version 2.0 – Phase 6: v2.0 Integration.
 
 ---
 
-## In Progress
+### Version 2.0 integration
 
-Version 2.0 – Phase 6: v2.0 Integration
+- Implemented immutable `ConversionResult`.
+- Integrated adapter normalization with the existing parser.
+- Integrated structured diagnostics and source mapping resolution.
+- Uses resolved sources throughout SQL and dbt artifact generation.
+- Propagates dbt generation configuration through the high-level API.
+- Combines orphan and missing-mapping warnings deterministically.
+- Returns models, artifacts, and the conversion report as one result.
+- Captures known mapping failures in failed conversion results.
+- Preserves direct Version 1 dictionary input compatibility.
+- Exposes source mapping resolution from the package root.
 
-Planned scope:
+### Version 2.0 integration test coverage
 
-- Introduce the immutable `ConversionResult`.
-- Integrate diagnostics, source mappings, SQL models, and dbt artifacts.
-- Preserve Version 1 JSON compatibility.
-- Add deterministic end-to-end Version 2 conversion coverage.
+- Complete models, artifacts, warnings, mappings, and configuration.
+- Existing Version 1 JSON input compatibility.
+- Conflicting source mappings returned as failed reports.
+- Deterministic end-to-end conversion results.
+
+**Status:** All Phase 6 test cases are passing (`4 passed`).
 
 ---
 
-## Next Phase
+## In Progress
 
 Version 2.1 – Phase 7: DuckDB Rendering and Execution
 
@@ -334,13 +345,22 @@ Planned scope:
 
 ---
 
+## Next Phase
+
+Version 2.1 – Phase 8: Result Comparison
+
+Planned scope:
+
+- Compare generated output with an expected CSV.
+- Compare column names, column order, and row counts.
+- Compare rows as multisets while preserving duplicate multiplicity.
+- Produce an immutable `ValidationSummary`.
+
+---
+
 ## Not Implemented
 
 The following Version 2 features are not yet implemented:
-
-### Remaining Version 2.0 phases
-
-- Version 2.0 end-to-end integration.
 
 ### Planned Version 2.1 phases
 
@@ -360,7 +380,7 @@ The following Version 2 features are not yet implemented:
 
 ## Current Status
 
-Version 1 is complete and Version 2 development is underway.
+Version 1 and Version 2.0 are complete. Version 2.1 development is underway.
 
 Completed:
 
@@ -374,3 +394,4 @@ Completed:
 - Improved SQL generation with deterministic aliases and qualified joins ✅
 - Deterministic dbt artifact generation ✅
 - Adapter extension contract and default JSON adapter ✅
+- Version 2.0 end-to-end integration ✅

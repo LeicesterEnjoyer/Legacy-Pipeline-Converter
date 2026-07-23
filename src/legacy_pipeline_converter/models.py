@@ -110,3 +110,11 @@ class ConversionReport:
     models_generated: tuple[str, ...]
     errors: tuple[str, ...]
     warnings: tuple[WarningInfo, ...]
+
+
+@dataclass(frozen=True)
+class ConversionResult:
+    ordered_pipeline: OrderedPipeline | None
+    models: tuple[GeneratedModel, ...]
+    artifacts: tuple[GeneratedArtifact, ...]
+    report: ConversionReport
