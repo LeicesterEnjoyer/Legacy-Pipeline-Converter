@@ -1,0 +1,4 @@
+id,customer_id,status,price,quantity
+1,100,completed,20,2
+2,101,cancelled,15,3
+3,100,completed,10,5

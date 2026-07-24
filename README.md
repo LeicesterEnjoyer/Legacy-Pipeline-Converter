@@ -134,7 +134,11 @@ legacy-pipeline-converter/
 ├── pyproject.toml                     # Project metadata and dependencies.
 ├── .gitignore                         # Git exclusions.
 ├── data/
+│   ├── sources/
+│   │   ├── orders.csv                 # Example orders source data.
+│   │   └── customers.csv              # Example customers source data.
 │   └── legacy_pipeline.json           # Example pipeline.
+│
 ├── docs/
 │   ├── SPEC.md                        # Requirements and acceptance criteria.
 │   ├── AGENTS.md                      # AI development workflow.
@@ -144,6 +148,8 @@ legacy-pipeline-converter/
 │   ├── implementation-plan-v1.md      # Approved architecture and phased test plan.
 │   └── implementation-plan-v2.md      # Version 2 implementation plan.
 ├── generated/                         # Generated SQL, YAML, and report artifacts.
+├── scripts/
+│   └── run_pipeline.py                # End-to-end example conversion runner.
 ├── src/
 │   └── legacy_pipeline_converter/
 │       ├── adapters/
@@ -239,6 +245,41 @@ python -m pip install -e ".[dev]"
 
 ```bash
 pytest
+```
+
+### Run the example conversion
+
+The repository contains an example pipeline definition together with sample source data.
+
+Run the end-to-end conversion example:
+
+```bash
+python scripts/run_pipeline.py
+```
+
+The script:
+
+- reads the example pipeline from `data/legacy_pipeline.json`;
+- reads the sample CSV source files from `data/sources/`;
+- converts the pipeline into the internal representation;
+- validates the pipeline;
+- generates deterministic dbt SQL models;
+- generates `sources.yml` and `schema.yml`;
+- generates a JSON conversion report;
+- writes all generated artifacts to the `generated/` directory.
+
+Generated files:
+
+```text
+generated/
+├── models/
+│   ├── enriched_orders.sql
+│   ├── final_output.sql 
+│   ├── orders_with_revenue.sql
+│   └── valid_orders.sql
+├── report.json
+├── schema.yml
+└── sources.yml
 ```
 
 ---
