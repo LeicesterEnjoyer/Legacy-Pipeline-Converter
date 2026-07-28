@@ -2,7 +2,7 @@
 
 ## Current Phase
 
-Version 2.1 – Phase 7: DuckDB Rendering and Execution.
+Version 2.1 – Phase 8: Result Comparison.
 
 ---
 
@@ -332,20 +332,35 @@ Version 2.1 – Phase 7: DuckDB Rendering and Execution.
 
 ---
 
-## In Progress
+### DuckDB rendering and execution
 
-Version 2.1 – Phase 7: DuckDB Rendering and Execution
+- Implemented immutable `SourceDataFile`.
+- Implemented immutable `ExecutionRequest`.
+- Implemented immutable `ExecutedPipeline`.
+- Implemented structured `ExecutionError`.
+- Renders the exact generated dbt `ref()` syntax for local execution.
+- Registers CSV source data in an isolated in-memory DuckDB connection.
+- Normalizes qualified warehouse source relations to local relation names.
+- Executes generated models in deterministic dependency order.
+- Supports explicitly selected output steps.
+- Returns the output relation name and row count.
+- Wraps source registration, SQL execution, and output query failures clearly.
+- Closes the DuckDB connection after every execution attempt.
+- Exposes `execute_models()` from the package root.
 
-Planned scope:
+### DuckDB execution test coverage
 
-- Render generated dbt references for local execution.
-- Register CSV sources in DuckDB.
-- Execute generated models in dependency order.
-- Return the selected output relation.
+- Exact generated reference rendering.
+- CSV source registration and querying.
+- Dependency-order execution independent of model argument order.
+- Explicit output relation selection.
+- Clear missing source file errors.
+
+**Status:** All Phase 7 test cases are passing (`5 passed`).
 
 ---
 
-## Next Phase
+## In Progress
 
 Version 2.1 – Phase 8: Result Comparison
 
@@ -358,13 +373,25 @@ Planned scope:
 
 ---
 
+## Next Phase
+
+Version 2.1 – Phase 9: v2.1 Integration
+
+Planned scope:
+
+- Expose optional execution through the high-level conversion API.
+- Include validation results in conversion reports.
+- Preserve silent conversion behavior when execution is not requested.
+- Add end-to-end execution and mismatch coverage.
+
+---
+
 ## Not Implemented
 
 The following Version 2 features are not yet implemented:
 
 ### Planned Version 2.1 phases
 
-- Executing generated SQL.
 - DuckDB-based result validation.
 - Comparing generated and expected datasets.
 
@@ -395,3 +422,4 @@ Completed:
 - Deterministic dbt artifact generation ✅
 - Adapter extension contract and default JSON adapter ✅
 - Version 2.0 end-to-end integration ✅
+- DuckDB rendering and dependency-order execution ✅

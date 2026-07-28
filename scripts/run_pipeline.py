@@ -1,6 +1,7 @@
 from pathlib import Path
 
 from legacy_pipeline_converter import convert_pipeline
+from legacy_pipeline_converter.execution import execute_models
 from legacy_pipeline_converter.io import (
     read_pipeline_json,
     write_dbt_artifacts,
@@ -9,7 +10,12 @@ from legacy_pipeline_converter.io import (
 )
 from legacy_pipeline_converter.models import (
     DbtGenerationConfig,
+    ExecutionRequest,
+    SourceDataFile,
     SourceMapping,
+)
+from legacy_pipeline_converter.source_mapping import (
+    resolve_source_mappings,
 )
 
 
@@ -17,6 +23,13 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent
 INPUT_PATH = PROJECT_ROOT / "data" / "legacy_pipeline.json"
 OUTPUT_DIRECTORY = PROJECT_ROOT / "generated"
 MODELS_DIRECTORY = OUTPUT_DIRECTORY / "models"
+
+ORDERS_SOURCE_PATH = (
+    PROJECT_ROOT / "data" / "sources" / "orders.csv"
+)
+CUSTOMERS_SOURCE_PATH = (
+    PROJECT_ROOT / "data" / "sources" / "customers.csv"
+)
 
 
 def main() -> None:
@@ -82,7 +95,7 @@ def main() -> None:
     for artifact in result.artifacts:
         print(f"- {OUTPUT_DIRECTORY / artifact.filename}")
 
-    print(f"\nConversion report:")
+    print("\nConversion report:")
     print(f"- {OUTPUT_DIRECTORY / 'report.json'}")
 
     if result.report.warnings:
@@ -90,6 +103,38 @@ def main() -> None:
 
         for warning in result.report.warnings:
             print(f"- [{warning.code}] {warning.message}")
+
+    if result.ordered_pipeline is None:
+        return
+
+    source_resolution = resolve_source_mappings(
+        result.ordered_pipeline.pipeline,
+        mappings,
+    )
+
+    executed = execute_models(
+        result.ordered_pipeline,
+        result.models,
+        source_resolution,
+        ExecutionRequest(
+            source_files=(
+                SourceDataFile(
+                    source_id="orders_source",
+                    path=str(ORDERS_SOURCE_PATH),
+                ),
+                SourceDataFile(
+                    source_id="customers_source",
+                    path=str(CUSTOMERS_SOURCE_PATH),
+                ),
+            ),
+            output_step_id="final_output",
+        ),
+    )
+
+    print("\nDuckDB execution result:")
+    print(f"- Output step: {executed.output_step_id}")
+    print(f"- Output relation: {executed.output_relation}")
+    print(f"- Row count: {executed.row_count}")
 
 
 if __name__ == "__main__":

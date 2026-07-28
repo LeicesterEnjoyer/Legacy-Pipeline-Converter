@@ -51,3 +51,7 @@ class SourceMappingError(ConversionError):
 
 class ConflictingSourceMappingError(SourceMappingError):
     """Raised when one source id has multiple different mappings."""
+
+
+class ExecutionError(ConversionError):
+    """Raised when generated models cannot be executed."""

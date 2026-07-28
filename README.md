@@ -1,6 +1,6 @@
 # Legacy ETL to ELT Modernisation Prototype
 
-A Python prototype that converts simplified legacy ETL pipeline definitions into modern ELT-style transformations and generates deterministic dbt-style SQL models and YAML artifacts.
+A Python prototype that converts simplified legacy ETL pipeline definitions into modern ELT-style transformations, generates deterministic dbt artifacts, and supports local execution through DuckDB.
 
 This project focuses on:
 
@@ -25,7 +25,8 @@ The application should:
 4. Build a dependency graph and determine transformation order.
 5. Generate deterministic dbt-style SQL models and dbt project artifacts.
 6. Produce a unified conversion result containing generated models, dbt artifacts, and a conversion report.
-7. Extend the conversion pipeline with execution and result validation capabilities.
+7. Execute generated transformations locally using DuckDB.
+8. Prepare the execution pipeline for dataset validation in future versions.
 
 ---
 
@@ -61,6 +62,10 @@ The application should:
 - Generate a JSON conversion report.
 - Provide an automated specification-driven test suite.
 - Integrate parsing, validation, diagnostics, source resolution, SQL generation, dbt artifact generation, and reporting through a unified conversion API.
+- Execute generated SQL models locally using DuckDB.
+- Register CSV source files for local execution.
+- Render generated dbt references for execution.
+- Return execution metadata for a selected output step.
 
 ---
 
@@ -161,6 +166,7 @@ legacy-pipeline-converter/
 │       ├── dbt_artifacts.py           # dbt YAML artifact generation.
 │       ├── diagnostics.py             # Structured warning generation.
 │       ├── errors.py                  # Custom exceptions.
+│       ├── execution.py               # DuckDB execution engine.
 │       ├── io.py                      # JSON input and generated file output.
 │       ├── models.py                  # Domain and supporting models.
 │       ├── ordering.py                # Dependency graph and deterministic ordering.
@@ -175,6 +181,7 @@ legacy-pipeline-converter/
 │   ├── test_api.py                    # End-to-end conversion tests.
 │   ├── test_dbt_artifacts.py          # dbt artifact generation tests.
 │   ├── test_diagnostics.py            # Structured warning and diagnostics tests.
+│   ├── test_execution.py              # DuckDB execution tests.
 │   ├── test_io.py                     # File input and output tests.
 │   ├── test_ordering.py               # Dependency ordering tests.
 │   ├── test_parser.py                 # Parser tests.
@@ -261,10 +268,11 @@ The script:
 
 - reads the example pipeline from `data/legacy_pipeline.json`;
 - reads the sample CSV source files from `data/sources/`;
-- converts the pipeline into the internal representation;
-- validates the pipeline;
+- normalizes and validates the pipeline;
+- resolves source mappings;
 - generates deterministic dbt SQL models;
 - generates `sources.yml` and `schema.yml`;
+- executes the generated models locally using DuckDB;
 - generates a JSON conversion report;
 - writes all generated artifacts to the `generated/` directory.
 
@@ -274,7 +282,7 @@ Generated files:
 generated/
 ├── models/
 │   ├── enriched_orders.sql
-│   ├── final_output.sql 
+│   ├── final_output.sql
 │   ├── orders_with_revenue.sql
 │   └── valid_orders.sql
 ├── report.json
@@ -282,12 +290,31 @@ generated/
 └── sources.yml
 ```
 
+Example console output:
+
+```text
+Conversion status: success
+
+Execution order:
+- orders_source
+- valid_orders
+- orders_with_revenue
+- customers_source
+- enriched_orders
+- final_output
+
+DuckDB execution:
+- Output step: final_output
+- Output relation: final_output
+- Row count: 2
+```
+
 ---
 
 ## Planned Future Work
 
-- DuckDB execution engine
-- Result validation and dataset comparison
+- Dataset validation against expected results
+- Automated result comparison
 - Vendor-specific adapter implementations
 - Additional transformation types
 - Real ETL formats (Informatica, SSIS, Talend, IICS)

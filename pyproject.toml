@@ -7,6 +7,7 @@ name = "legacy-pipeline-converter"
 version = "0.1.0"
 requires-python = ">=3.11"
 dependencies = [
+    "duckdb>=1.4",
     "PyYAML>=6.0",
 ]
 

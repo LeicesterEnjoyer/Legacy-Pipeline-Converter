@@ -75,6 +75,26 @@ class DbtGenerationConfig:
 
 
 @dataclass(frozen=True)
+class SourceDataFile:
+    source_id: str
+    path: str
+
+
+@dataclass(frozen=True)
+class ExecutionRequest:
+    source_files: tuple[SourceDataFile, ...]
+    output_step_id: str
+    expected_file: str | None = None
+
+
+@dataclass(frozen=True)
+class ExecutedPipeline:
+    output_step_id: str
+    output_relation: str
+    row_count: int
+
+
+@dataclass(frozen=True)
 class WarningInfo:
     code: str
     message: str
