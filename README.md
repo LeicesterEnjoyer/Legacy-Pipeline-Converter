@@ -26,7 +26,7 @@ The application should:
 5. Generate deterministic dbt-style SQL models and dbt project artifacts.
 6. Produce a unified conversion result containing generated models, dbt artifacts, and a conversion report.
 7. Execute generated transformations locally using DuckDB.
-8. Prepare the execution pipeline for dataset validation in future versions.
+8. Validate execution results against expected datasets.
 
 ---
 
@@ -66,6 +66,9 @@ The application should:
 - Register CSV source files for local execution.
 - Render generated dbt references for execution.
 - Return execution metadata for a selected output step.
+- Capture immutable execution snapshots containing output columns and rows.
+- Compare execution results against expected CSV datasets.
+- Report column, row count, and row value differences.
 
 ---
 
@@ -77,7 +80,6 @@ The application should:
 - Arbitrary SQL conversion
 - Direct LLM integration
 - Support for every transformation type
-- Execution and result validation
 
 ---
 
@@ -139,6 +141,8 @@ legacy-pipeline-converter/
 ├── pyproject.toml                     # Project metadata and dependencies.
 ├── .gitignore                         # Git exclusions.
 ├── data/
+│   ├── expected/
+│   │   └── final_output.csv           # Expected output dataset.
 │   ├── sources/
 │   │   ├── orders.csv                 # Example orders source data.
 │   │   └── customers.csv              # Example customers source data.
@@ -150,6 +154,7 @@ legacy-pipeline-converter/
 │   ├── AGENT_FAILURES.md              # Lessons learned from AI-assisted development.
 │   ├── PROJECT_STATE.md               # Current implementation status.
 │   ├── clarifications-v1.md           # Resolved ambiguities for v1.
+│   ├── clarifications-v2.md           # Resolved ambiguities for v2.
 │   ├── implementation-plan-v1.md      # Approved architecture and phased test plan.
 │   └── implementation-plan-v2.md      # Version 2 implementation plan.
 ├── generated/                         # Generated SQL, YAML, and report artifacts.
@@ -172,6 +177,7 @@ legacy-pipeline-converter/
 │       ├── ordering.py                # Dependency graph and deterministic ordering.
 │       ├── parser.py                  # Dictionary-to-domain parser.
 │       ├── report.py                  # Conversion report generation.
+│       ├── result_validation.py       # Execution result validation.
 │       ├── source_mapping.py          # Source-to-relation resolution.
 │       ├── sql_generator.py           # dbt-style SQL model generation.
 │       └── validator.py               # Pipeline validation rules.
@@ -186,6 +192,7 @@ legacy-pipeline-converter/
 │   ├── test_ordering.py               # Dependency ordering tests.
 │   ├── test_parser.py                 # Parser tests.
 │   ├── test_report.py                 # Conversion report tests.
+│   ├── test_result_validation.py      # Execution result validation tests.
 │   ├── test_source_mapping.py         # Source mapping tests.
 │   ├── test_sql_generator.py          # SQL generation tests.
 │   ├── test_validator.py              # Validation tests.
@@ -273,6 +280,8 @@ The script:
 - generates deterministic dbt SQL models;
 - generates `sources.yml` and `schema.yml`;
 - executes the generated models locally using DuckDB;
+- captures the executed output as an immutable snapshot;
+- validates the execution result against the expected dataset;
 - generates a JSON conversion report;
 - writes all generated artifacts to the `generated/` directory.
 
@@ -306,15 +315,22 @@ Execution order:
 DuckDB execution:
 - Output step: final_output
 - Output relation: final_output
+- Columns:
+  ('id', 'customer_id', 'status', 'price', 'quantity', 'revenue', 'id_1', 'name')
 - Row count: 2
+
+Result validation:
+- Executed: True
+- Passed: True
+- Actual row count: 2
+- Expected row count: 2
+- No differences found.
 ```
 
 ---
 
 ## Planned Future Work
 
-- Dataset validation against expected results
-- Automated result comparison
 - Vendor-specific adapter implementations
 - Additional transformation types
 - Real ETL formats (Informatica, SSIS, Talend, IICS)

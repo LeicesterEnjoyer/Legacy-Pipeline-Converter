@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Literal
+from typing import Any, Literal
 
 
 @dataclass(frozen=True)
@@ -91,7 +91,30 @@ class ExecutionRequest:
 class ExecutedPipeline:
     output_step_id: str
     output_relation: str
+    columns: tuple[str, ...]
+    rows: tuple[tuple[Any, ...], ...]
     row_count: int
+
+
+@dataclass(frozen=True)
+class DifferenceDetail:
+    kind: Literal[
+        "row_count",
+        "column_names",
+        "column_types",
+        "row_values",
+    ]
+    message: str
+
+
+@dataclass(frozen=True)
+class ValidationSummary:
+    executed: bool
+    passed: bool | None
+    output_step_id: str | None = None
+    actual_row_count: int | None = None
+    expected_row_count: int | None = None
+    differences: tuple[DifferenceDetail, ...] = ()
 
 
 @dataclass(frozen=True)

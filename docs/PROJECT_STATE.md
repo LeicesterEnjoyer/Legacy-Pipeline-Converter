@@ -2,7 +2,7 @@
 
 ## Current Phase
 
-Version 2.1 – Phase 8: Result Comparison.
+Version 2.1 – Phase 9: v2.1 Integration.
 
 ---
 
@@ -343,7 +343,7 @@ Version 2.1 – Phase 8: Result Comparison.
 - Normalizes qualified warehouse source relations to local relation names.
 - Executes generated models in deterministic dependency order.
 - Supports explicitly selected output steps.
-- Returns the output relation name and row count.
+- Returns the output relation name, ordered columns, immutable rows, and row count.
 - Wraps source registration, SQL execution, and output query failures clearly.
 - Closes the DuckDB connection after every execution attempt.
 - Exposes `execute_models()` from the package root.
@@ -360,20 +360,35 @@ Version 2.1 – Phase 8: Result Comparison.
 
 ---
 
-## In Progress
+### Result comparison
 
-Version 2.1 – Phase 8: Result Comparison
+- Implemented immutable `DifferenceDetail`.
+- Implemented immutable `ValidationSummary`.
+- Implemented structured `ResultValidationError`.
+- Compares an immutable executed-output snapshot with an expected CSV.
+- Uses DuckDB CSV inference for consistent scalar values and `NULL` handling.
+- Treats column names and column order as significant.
+- Compares row counts before row values.
+- Compares rows as multisets, ignoring order while preserving duplicates.
+- Uses exact value comparison without floating-point tolerance.
+- Returns mismatches as deterministic validation details.
+- Raises clear errors when expected data cannot be read.
+- Exposes `compare_results()` from the package root.
 
-Planned scope:
+### Result comparison test coverage
 
-- Compare generated output with an expected CSV.
-- Compare column names, column order, and row counts.
-- Compare rows as multisets while preserving duplicate multiplicity.
-- Produce an immutable `ValidationSummary`.
+- Equal multisets with different row order.
+- Column name and order mismatches.
+- Row-count mismatches.
+- Row-value mismatches.
+- Duplicate row multiplicity.
+- Unreadable expected result files.
+
+**Status:** All Phase 8 test cases are passing (`6 passed`).
 
 ---
 
-## Next Phase
+## In Progress
 
 Version 2.1 – Phase 9: v2.1 Integration
 
@@ -386,14 +401,21 @@ Planned scope:
 
 ---
 
+## Next Phase
+
+No implementation phase is specified after Phase 9.
+
+Future work remains subject to a separate specification.
+
+---
+
 ## Not Implemented
 
 The following Version 2 features are not yet implemented:
 
 ### Planned Version 2.1 phases
 
-- DuckDB-based result validation.
-- Comparing generated and expected datasets.
+- Version 2.1 end-to-end integration.
 
 ### Future versions
 
@@ -423,3 +445,4 @@ Completed:
 - Adapter extension contract and default JSON adapter ✅
 - Version 2.0 end-to-end integration ✅
 - DuckDB rendering and dependency-order execution ✅
+- Immutable snapshot result comparison ✅

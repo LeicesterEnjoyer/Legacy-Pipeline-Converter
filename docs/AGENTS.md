@@ -2,8 +2,7 @@
 
 ## General workflow
 
-- Read `SPEC.md`, `PROJECT_STATE.md`, the active implementation plan, and
-  `AGENT_FAILURES.md` before making any changes.
+- Read everything in `docs\` before making any changes.
 - Use `PROJECT_STATE.md` to determine the current phase.
 - Treat the active implementation plan as authoritative for phase scope and sequencing.
 - Explain the proposed approach before implementing it.
@@ -14,7 +13,7 @@
 
 ## Requirements for Every Phase
 
-- Read `PROJECT_STATE.md`, `implementation-plan-v2.md`, and `AGENT_FAILURES.md` before implementing the current phase.
+- Read `PROJECT_STATE.md`, `implementation-plan-v2.md`, `clarifications-v2.md` `AGENT_FAILURES.md` before implementing the current phase.
 - Treat `implementation-plan-v2.md` as the authoritative specification.
 - Work strictly within the current implementation phase.
 - Follow the approved TDD workflow:

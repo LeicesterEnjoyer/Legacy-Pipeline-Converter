@@ -14,6 +14,7 @@ from legacy_pipeline_converter.models import (
     SourceDataFile,
     SourceMapping,
 )
+from legacy_pipeline_converter.result_validation import compare_results
 from legacy_pipeline_converter.source_mapping import (
     resolve_source_mappings,
 )
@@ -29,6 +30,9 @@ ORDERS_SOURCE_PATH = (
 )
 CUSTOMERS_SOURCE_PATH = (
     PROJECT_ROOT / "data" / "sources" / "customers.csv"
+)
+EXPECTED_OUTPUT_PATH = (
+    PROJECT_ROOT / "data" / "expected" / "final_output.csv"
 )
 
 
@@ -128,13 +132,40 @@ def main() -> None:
                 ),
             ),
             output_step_id="final_output",
+            expected_file=str(EXPECTED_OUTPUT_PATH),
         ),
     )
 
     print("\nDuckDB execution result:")
     print(f"- Output step: {executed.output_step_id}")
     print(f"- Output relation: {executed.output_relation}")
+    print(f"- Columns: {executed.columns}")
     print(f"- Row count: {executed.row_count}")
+
+    print("\nExecuted rows:")
+
+    for row in executed.rows:
+        print(f"- {row}")
+
+    validation = compare_results(
+        executed,
+        str(EXPECTED_OUTPUT_PATH),
+    )
+
+    print("\nResult validation:")
+    print(f"- Executed: {validation.executed}")
+    print(f"- Passed: {validation.passed}")
+    print(f"- Output step: {validation.output_step_id}")
+    print(f"- Actual row count: {validation.actual_row_count}")
+    print(f"- Expected row count: {validation.expected_row_count}")
+
+    if validation.differences:
+        print("\nValidation differences:")
+
+        for difference in validation.differences:
+            print(f"- [{difference.kind}] {difference.message}")
+    else:
+        print("- No differences found.")
 
 
 if __name__ == "__main__":

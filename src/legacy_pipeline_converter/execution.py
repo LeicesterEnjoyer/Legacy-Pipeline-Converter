@@ -179,10 +179,18 @@ def execute_models(
         output_relation = request.output_step_id
 
         try:
-            row_count_result = connection.execute(
-                f"SELECT COUNT(*) FROM "
+            output_cursor = connection.execute(
+                f"SELECT * FROM "
                 f"{_quote_identifier(output_relation)}"
-            ).fetchone()
+            )
+            columns = tuple(
+                column[0]
+                for column in output_cursor.description
+            )
+            rows = tuple(
+                tuple(row)
+                for row in output_cursor.fetchall()
+            )
         except duckdb.Error as error:
             raise ExecutionError(
                 step_id=request.output_step_id,
@@ -193,20 +201,12 @@ def execute_models(
                 ),
             ) from error
 
-        if row_count_result is None:
-            raise ExecutionError(
-                step_id=request.output_step_id,
-                field="output_step_id",
-                message=(
-                    f"Execution output {request.output_step_id!r} "
-                    "did not return a row count."
-                ),
-            )
-
         return ExecutedPipeline(
             output_step_id=request.output_step_id,
             output_relation=output_relation,
-            row_count=int(row_count_result[0]),
+            columns=columns,
+            rows=rows,
+            row_count=len(rows),
         )
     finally:
         connection.close()

@@ -55,3 +55,7 @@ class ConflictingSourceMappingError(SourceMappingError):
 
 class ExecutionError(ConversionError):
     """Raised when generated models cannot be executed."""
+
+
+class ResultValidationError(ConversionError):
+    """Raised when result comparison cannot be performed."""
