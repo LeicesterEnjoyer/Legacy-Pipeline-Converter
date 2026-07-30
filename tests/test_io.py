@@ -73,6 +73,7 @@ def test_write_sql_models_and_report_creates_files(tmp_path: Path) -> None:
         ],
         "errors": [],
         "warnings": [],
+        "validation": None,
     }
 
 

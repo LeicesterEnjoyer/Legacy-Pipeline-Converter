@@ -1,15 +1,17 @@
 from collections.abc import Sequence
+from typing import Literal
 
-from .models import ConversionReport, WarningInfo
+from .models import ConversionReport, ValidationSummary, WarningInfo
 
 
 def build_report(
     *,
     pipeline_name: str,
-    status: str,
+    status: Literal["success", "failed"],
     models_generated: Sequence[str],
     errors: Sequence[str],
     warnings: Sequence[WarningInfo],
+    validation: ValidationSummary | None = None,
 ) -> ConversionReport:
     return ConversionReport(
         pipeline_name=pipeline_name,
@@ -17,4 +19,5 @@ def build_report(
         models_generated=tuple(models_generated),
         errors=tuple(errors),
         warnings=tuple(warnings),
+        validation=validation,
     )

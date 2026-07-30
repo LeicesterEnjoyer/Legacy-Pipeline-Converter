@@ -149,10 +149,11 @@ class SourceResolution:
 @dataclass(frozen=True)
 class ConversionReport:
     pipeline_name: str
-    status: str
+    status: Literal["success", "failed"]
     models_generated: tuple[str, ...]
     errors: tuple[str, ...]
     warnings: tuple[WarningInfo, ...]
+    validation: ValidationSummary | None = None
 
 
 @dataclass(frozen=True)

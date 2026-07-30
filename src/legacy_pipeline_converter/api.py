@@ -5,14 +5,18 @@ from .adapters import JsonPipelineAdapter, PipelineAdapter
 from .dbt_artifacts import generate_dbt_artifacts
 from .diagnostics import collect_pipeline_warnings
 from .errors import ConversionError
+from .execution import execute_models
 from .models import (
     ConversionResult,
     DbtGenerationConfig,
+    ExecutionRequest,
     SourceMapping,
+    ValidationSummary,
 )
 from .ordering import order_steps
 from .parser import parse_pipeline
 from .report import build_report
+from .result_validation import compare_results
 from .source_mapping import resolve_source_mappings
 from .sql_generator import generate_models
 from .validator import validate_pipeline
@@ -24,6 +28,7 @@ def convert_pipeline(
     adapter: PipelineAdapter | None = None,
     mappings: Sequence[SourceMapping] = (),
     dbt_config: DbtGenerationConfig | None = None,
+    execution_request: ExecutionRequest | None = None,
 ) -> ConversionResult:
     data: dict[str, Any] = {}
 
@@ -50,6 +55,28 @@ def convert_pipeline(
             dbt_config,
         )
         warnings = pipeline_warnings + source_resolution.warnings
+        validation: ValidationSummary | None = None
+
+        if execution_request is not None:
+            executed_pipeline = execute_models(
+                ordered_pipeline,
+                models,
+                source_resolution,
+                execution_request,
+            )
+
+            if execution_request.expected_file is None:
+                validation = ValidationSummary(
+                    executed=True,
+                    passed=None,
+                    output_step_id=executed_pipeline.output_step_id,
+                    actual_row_count=executed_pipeline.row_count,
+                )
+            else:
+                validation = compare_results(
+                    executed_pipeline,
+                    execution_request.expected_file,
+                )
 
         report = build_report(
             pipeline_name=validated_pipeline.name,
@@ -57,6 +84,7 @@ def convert_pipeline(
             models_generated=tuple(model.filename for model in models),
             errors=(),
             warnings=warnings,
+            validation=validation,
         )
 
         return ConversionResult(

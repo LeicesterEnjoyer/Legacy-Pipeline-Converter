@@ -12,6 +12,8 @@ from legacy_pipeline_converter.io import (
 from legacy_pipeline_converter.models import (
     ConversionResult,
     DbtGenerationConfig,
+    ExecutionRequest,
+    SourceDataFile,
     SourceMapping,
 )
 
@@ -194,3 +196,144 @@ def test_end_to_end_file_round_trip(tmp_path: Path) -> None:
 
     assert report_data["status"] == "success"
     assert len(report_data["models_generated"]) == 4
+
+
+def test_convert_pipeline_without_execution_has_no_execution_warning(
+    example_pipeline_data: dict,
+) -> None:
+    result = convert_pipeline(example_pipeline_data)
+
+    assert result.report.validation is None
+    assert all(
+        warning.code != "execution_not_requested"
+        for warning in result.report.warnings
+    )
+
+
+def test_convert_pipeline_with_matching_expected_result_passes_validation(
+    example_pipeline_data: dict,
+) -> None:
+    result = convert_pipeline(
+        example_pipeline_data,
+        execution_request=ExecutionRequest(
+            source_files=(
+                SourceDataFile(
+                    source_id="orders_source",
+                    path="data/sources/orders.csv",
+                ),
+                SourceDataFile(
+                    source_id="customers_source",
+                    path="data/sources/customers.csv",
+                ),
+            ),
+            output_step_id="final_output",
+            expected_file="data/expected/final_output.csv",
+        ),
+    )
+
+    assert result.report.status == "success"
+    assert result.report.validation is not None
+    assert result.report.validation.executed is True
+    assert result.report.validation.passed is True
+    assert result.report.validation.output_step_id == "final_output"
+    assert result.report.validation.actual_row_count == 2
+    assert result.report.validation.expected_row_count == 2
+    assert result.report.validation.differences == ()
+
+
+def test_convert_pipeline_with_mismatch_returns_failed_validation_summary(
+    example_pipeline_data: dict,
+    tmp_path: Path,
+) -> None:
+    expected_path = tmp_path / "expected.csv"
+    expected_path.write_text(
+        (
+            "id,customer_id,status,price,quantity,revenue,id_1,name\n"
+            "1,101,complete,120.0,2,999.0,101,Alice\n"
+            "3,101,complete,80.0,1,79.0,101,Alice\n"
+        ),
+        encoding="utf-8",
+    )
+
+    result = convert_pipeline(
+        example_pipeline_data,
+        execution_request=ExecutionRequest(
+            source_files=(
+                SourceDataFile(
+                    source_id="orders_source",
+                    path="data/sources/orders.csv",
+                ),
+                SourceDataFile(
+                    source_id="customers_source",
+                    path="data/sources/customers.csv",
+                ),
+            ),
+            output_step_id="final_output",
+            expected_file=str(expected_path),
+        ),
+    )
+
+    assert result.report.status == "success"
+    assert result.report.validation is not None
+    assert result.report.validation.executed is True
+    assert result.report.validation.passed is False
+    assert [
+        difference.kind
+        for difference in result.report.validation.differences
+    ] == ["row_values"]
+
+
+def test_convert_pipeline_execution_error_returns_failed_report(
+    example_pipeline_data: dict,
+    tmp_path: Path,
+) -> None:
+    missing_path = tmp_path / "missing-orders.csv"
+
+    result = convert_pipeline(
+        example_pipeline_data,
+        execution_request=ExecutionRequest(
+            source_files=(
+                SourceDataFile(
+                    source_id="orders_source",
+                    path=str(missing_path),
+                ),
+                SourceDataFile(
+                    source_id="customers_source",
+                    path="data/sources/customers.csv",
+                ),
+            ),
+            output_step_id="final_output",
+            expected_file="data/expected/final_output.csv",
+        ),
+    )
+
+    assert result.ordered_pipeline is None
+    assert result.models == ()
+    assert result.artifacts == ()
+    assert result.report.status == "failed"
+    assert result.report.validation is None
+    assert len(result.report.errors) == 1
+    assert str(missing_path) in result.report.errors[0]
+
+
+def test_v2_complete_suite_preserves_v1_regressions(
+    example_pipeline_data: dict,
+) -> None:
+    result = convert_pipeline(example_pipeline_data)
+
+    assert result.ordered_pipeline is not None
+    assert result.ordered_pipeline.execution_order == (
+        "orders_source",
+        "valid_orders",
+        "orders_with_revenue",
+        "customers_source",
+        "enriched_orders",
+        "final_output",
+    )
+    assert tuple(model.filename for model in result.models) == (
+        "valid_orders.sql",
+        "orders_with_revenue.sql",
+        "enriched_orders.sql",
+        "final_output.sql",
+    )
+    assert result.report.status == "success"

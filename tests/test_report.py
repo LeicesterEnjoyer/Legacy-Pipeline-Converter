@@ -23,6 +23,7 @@ def test_build_report_success_schema() -> None:
         "models_generated",
         "errors",
         "warnings",
+        "validation",
     }
 
     assert report_data["pipeline_name"] == "demo"
@@ -33,6 +34,7 @@ def test_build_report_success_schema() -> None:
     )
     assert report_data["errors"] == ()
     assert report_data["warnings"] == ()
+    assert report_data["validation"] is None
 
 
 def test_build_report_success_populates_models_generated() -> None:
