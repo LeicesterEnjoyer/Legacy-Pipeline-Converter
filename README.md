@@ -30,7 +30,7 @@ The application should:
 
 ---
 
-## Current Scope (v2.0)
+## Current Scope (v2.1)
 
 ### Supported transformation types
 
@@ -69,6 +69,7 @@ The application should:
 - Capture immutable execution snapshots containing output columns and rows.
 - Compare execution results against expected CSV datasets.
 - Report column, row count, and row value differences.
+- Support optional execution and result validation through the unified conversion API.
 
 ---
 
@@ -218,7 +219,7 @@ Version 1 is complete.
 
 Version 2.0 is complete.
 
-Version 2.1 is currently under active development.
+Version 2.1 is complete.
 
 For implementation progress and architecture, see:
 
@@ -279,9 +280,9 @@ The script:
 - resolves source mappings;
 - generates deterministic dbt SQL models;
 - generates `sources.yml` and `schema.yml`;
-- executes the generated models locally using DuckDB;
-- captures the executed output as an immutable snapshot;
-- validates the execution result against the expected dataset;
+- executes the generated models locally using DuckDB (optional);
+- validates the execution result against the expected dataset when provided;
+- includes execution and validation results in the conversion report;
 - generates a JSON conversion report;
 - writes all generated artifacts to the `generated/` directory.
 
@@ -312,16 +313,10 @@ Execution order:
 - enriched_orders
 - final_output
 
-DuckDB execution:
-- Output step: final_output
-- Output relation: final_output
-- Columns:
-  ('id', 'customer_id', 'status', 'price', 'quantity', 'revenue', 'id_1', 'name')
-- Row count: 2
-
-Result validation:
+Execution and result validation:
 - Executed: True
 - Passed: True
+- Output step: final_output
 - Actual row count: 2
 - Expected row count: 2
 - No differences found.

@@ -2,7 +2,7 @@
 
 ## Current Phase
 
-Version 2.1 – Phase 9: v2.1 Integration.
+Version 2.1 is complete.
 
 ---
 
@@ -388,16 +388,32 @@ Version 2.1 – Phase 9: v2.1 Integration.
 
 ---
 
+### Version 2.1 integration
+
+- Added optional `ExecutionRequest` support to `convert_pipeline()`.
+- Executes generated models only when explicitly requested.
+- Compares executed output with an expected CSV when one is supplied.
+- Includes immutable validation summaries in conversion reports.
+- Keeps conversion status successful when comparison completes with differences.
+- Captures known execution and result-validation errors in failed reports.
+- Preserves silent conversion behavior when execution is not requested.
+- Preserves Version 1 and Version 2.0 API behavior when execution is omitted.
+
+### Version 2.1 integration test coverage
+
+- Conversion without execution emits no execution warning.
+- Matching expected results produce a passing validation summary.
+- Result mismatches produce a failed validation summary without failing conversion.
+- Execution errors produce failed conversion reports.
+- Complete Version 1 and Version 2 regression coverage.
+
+**Status:** All Phase 9 test cases are passing (`5 passed`).
+
+---
+
 ## In Progress
 
-Version 2.1 – Phase 9: v2.1 Integration
-
-Planned scope:
-
-- Expose optional execution through the high-level conversion API.
-- Include validation results in conversion reports.
-- Preserve silent conversion behavior when execution is not requested.
-- Add end-to-end execution and mismatch coverage.
+No implementation phase is currently in progress.
 
 ---
 
@@ -411,12 +427,6 @@ Future work remains subject to a separate specification.
 
 ## Not Implemented
 
-The following Version 2 features are not yet implemented:
-
-### Planned Version 2.1 phases
-
-- Version 2.1 end-to-end integration.
-
 ### Future versions
 
 - Parsing real Informatica, SSIS, Talend, or IICS formats.
@@ -429,7 +439,7 @@ The following Version 2 features are not yet implemented:
 
 ## Current Status
 
-Version 1 and Version 2.0 are complete. Version 2.1 development is underway.
+Version 1, Version 2.0, and Version 2.1 are complete.
 
 Completed:
 
@@ -446,3 +456,4 @@ Completed:
 - Version 2.0 end-to-end integration ✅
 - DuckDB rendering and dependency-order execution ✅
 - Immutable snapshot result comparison ✅
+- Version 2.1 end-to-end execution and validation integration ✅
