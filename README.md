@@ -84,6 +84,102 @@ The application should:
 
 ---
 
+## Program Workflow
+
+The complete workflow is:
+
+```text
+Legacy pipeline input
+        ↓
+Pipeline adapter
+        ↓
+Parsing into domain models
+        ↓
+Pipeline validation
+        ↓
+Warning and orphan-step diagnostics
+        ↓
+Source mapping resolution
+        ↓
+Dependency graph and execution ordering
+        ↓
+dbt SQL model generation
+        ↓
+dbt YAML artifact generation
+        ↓
+Optional DuckDB execution
+        ↓
+Optional expected-result comparison
+        ↓
+Conversion report
+        ↓
+Generated SQL, YAML, and JSON artifacts
+```
+
+### Workflow steps
+
+1. Input normalization
+
+    The user provides a pipeline definition. The default
+    JsonPipelineAdapter accepts the existing dictionary-based JSON format,
+    while custom adapters can normalize other formats in the future.
+
+2. Parsing
+
+    The normalized dictionary is converted into immutable domain models such
+    as SourceStep, FilterStep, CalculatedColumnStep, JoinStep, and
+    OutputStep.
+
+3. Validation
+
+    The pipeline is checked for duplicate step IDs, missing dependencies,
+    unsupported join types, and the presence of at least one output step.
+
+4. Diagnostics
+
+    Non-fatal issues, such as orphan steps that are not used by any output,
+    are collected as structured warnings.
+
+5. Source resolution
+
+    Source steps are mapped to warehouse relations. Explicit mappings are used
+    when provided, otherwise deterministic fallback relation names are
+    generated.
+
+6. Dependency ordering
+
+    The pipeline dependency graph is topologically sorted to produce a
+    deterministic execution order.
+
+7. SQL generation
+
+    One deterministic dbt-style SQL model is generated for every non-source
+    step.
+
+8. dbt artifact generation
+
+    The project generates deterministic sources.yml and schema.yml
+    artifacts.
+
+9. Optional execution
+
+    When an ExecutionRequest is provided, source CSV files are registered in
+    an in-memory DuckDB database and the generated models are executed in
+    dependency order.
+
+10. Optional result validation
+
+    When an expected CSV file is provided, the selected output is compared
+    against it using column names, column order, row count, and row values.
+
+11. Reporting
+
+    The final ConversionResult contains the ordered pipeline, generated SQL
+    models, generated dbt artifacts, and a conversion report containing
+    warnings, errors, and optional validation results.
+
+---
+
 ## Example Pipeline
 
 ```json
