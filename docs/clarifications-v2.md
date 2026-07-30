@@ -79,3 +79,90 @@ connection is closed.
 This trade-off is accepted for the prototype because the expected
 datasets are small. Streaming comparison and persistent DuckDB
 connections remain out of scope.
+
+---
+
+## Phase 9 execution without expected result data
+
+### Question
+
+How should the conversion report represent a successful execution when
+an `ExecutionRequest` is provided without an `expected_file`?
+
+### Clarification
+
+When an `ExecutionRequest` is supplied, the generated pipeline is
+executed even if no expected result file is provided.
+
+If execution completes successfully but `expected_file` is `None`, the
+conversion report stores:
+
+```python
+ValidationSummary(
+    executed=True,
+    passed=None,
+    output_step_id=executed_pipeline.output_step_id,
+    actual_row_count=executed_pipeline.row_count,
+    expected_row_count=None,
+    differences=(),
+)
+```
+
+In this state:
+
+- `executed=True` means the generated models were successfully executed;
+- `passed=None` means result comparison was not requested;
+- `actual_row_count` contains the number of rows produced by the selected output;
+- `expected_row_count` remains `None`;
+- `differences` remains empty because no comparison was performed.
+
+### Comparison behaviour
+
+When `expected_file` is provided, Phase 8 result comparison is performed
+and `passed` becomes:
+
+- `True` when the actual and expected results match;
+- `False` when the comparison completes and differences are found.
+
+When `expected_file` is not provided, execution still occurs, but no
+comparison is performed.
+
+### Rationale
+
+This distinction allows the report to represent three separate states:
+
+```text
+Execution not requested:
+executed=False
+passed=None
+
+Execution completed without comparison:
+executed=True
+passed=None
+
+Execution completed with comparison:
+executed=True
+passed=True or False
+```
+
+This preserves useful execution metadata without requiring an expected
+dataset for every execution request.
+
+### Failure behaviour
+
+If execution cannot be completed, such as because of a missing source
+file or invalid generated SQL, the conversion returns a failed report.
+
+If an expected file is supplied but cannot be read, the conversion also
+returns a failed report.
+
+A completed comparison that finds data differences does not fail the
+conversion itself. It returns a successful conversion report containing:
+
+```python
+ValidationSummary(
+    executed=True,
+    passed=False,
+    ...
+)
+```
