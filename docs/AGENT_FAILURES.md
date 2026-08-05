@@ -45,7 +45,7 @@ When the specification guarantees the presence of a value, reflect that guarante
 
 ### Related specification
 
-- [Phase 2 – Validation](dimplementation-plan-v1.md#phase-2-validation)
+- [Phase 2 – Validation](implementation-plan-v1.md#phase-2-validation)
 - [C6. Supported join types](clarifications-v1.md#c6-supported-join-types)
 
 ### Context
